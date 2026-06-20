@@ -1,19 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Island Journal — A Cozy Reflection Spot</title>
-  <meta name="description" content="Pull the lever to draw two cozy journaling prompts. Animal Crossing inspired." />
+  <title>小岛日记 · Island Journal</title>
+  <meta name="description" content="拉下手摇杆,抽取今天的日记话题。Pull the lever, draw today's reflection prompts." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <!-- Real animal-island-vue stylesheet -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animal-island-vue@0.2.1/dist/index.css" />
 
-  <!-- Importmap: bare specifiers resolve to ESM CDN URLs -->
   <script type="importmap">
   {
     "imports": {
@@ -26,12 +24,19 @@
   <style>
     :root {
       --primary: #19c8b9;
+      --teal: #82d5bb;
+      --teal-deep: #40a880;
+      --yellow: #f7cd67;
+      --yellow-deep: #d4a030;
       --text: #794f27;
       --text-body: #725d42;
       --text-muted: #8a7b66;
       --bg: #f8f8f0;
       --bg-content: rgb(247, 243, 223);
       --border: #c4b89e;
+      --wood-light: #c9a26b;
+      --wood: #a06d3f;
+      --wood-dark: #5c3d1f;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -44,50 +49,144 @@
       -webkit-font-smoothing: antialiased;
     }
     .page {
-      max-width: 680px;
+      max-width: 920px;
       margin: 0 auto;
-      padding: 40px 20px 80px;
+      padding: 32px 24px 80px;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 28px;
     }
-    .stack-tight {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      text-align: center;
+
+    /* =============== TOP BAR =============== */
+    .top-bar {
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) 1fr;
+      gap: 32px;
+      align-items: stretch;
     }
-    .tagline {
-      color: var(--text-body);
-      font-weight: 500;
-      font-size: 15px;
-      max-width: 480px;
-      line-height: 1.55;
-    }
-    .slot-machine {
-      width: 100%;
-      max-width: 540px;
-      padding: 32px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .slot-machine-header {
-      display: flex;
-      justify-content: center;
-      margin-top: -10px;
-      margin-bottom: 4px;
-    }
-    .reel-card {
+
+    /* date note (left) */
+    .date-note {
       position: relative;
-      min-height: 110px;
-      padding: 14px 18px !important;
+      padding: 14px 18px 18px !important;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: rotate(-1.5deg);
+    }
+    .date-note-tag {
+      position: absolute;
+      top: -14px;
+      left: 18px;
+      z-index: 2;
+    }
+    .date-note-body {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: center;
+    }
+    .date-note-ymd {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 3px 0;
+    }
+    .date-note-weekday {
+      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+      font-size: 38px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: 4px;
+      line-height: 1.1;
+      margin: 4px 0 6px;
+    }
+    .date-note-lunar {
+      font-size: 13px;
+      color: var(--text-body);
+      padding: 4px 10px;
+      border: 1.5px dashed rgba(120, 90, 50, 0.35);
+      border-radius: 999px;
+      align-self: center;
+      font-weight: 600;
+    }
+
+    /* branding (right) */
+    .branding {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      text-align: right;
+      gap: 12px;
+      padding-right: 6px;
+    }
+    .branding-cn {
+      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+      font-size: clamp(40px, 6.5vw, 60px);
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: 6px;
+      line-height: 1;
+      -webkit-text-stroke: 1.5px transparent;
+      text-shadow:
+        0 2px 0 rgba(120, 80, 30, 0.12),
+        0 4px 0 rgba(120, 80, 30, 0.08);
+    }
+    .branding-en {
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--teal-deep);
+      text-transform: uppercase;
+    }
+    .typewriter-line {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-body);
+      line-height: 1.6;
+      min-height: 1.6em;
+      display: inline-block;
+      max-width: 100%;
+    }
+    .typewriter-line::after {
+      content: '|';
+      display: inline-block;
+      width: 0;
+      margin-left: 2px;
+      color: var(--teal-deep);
+      animation: caret 0.9s steps(1) infinite;
+    }
+    @keyframes caret { 50% { opacity: 0; } }
+
+    /* =============== SLOT MACHINE =============== */
+    .slot-machine {
+      padding: 28px 26px !important;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .slot-row {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .reels {
+      flex: 1;
+      display: flex;
+      gap: 14px;
+      min-width: 0;
+    }
+    .reel-card {
+      flex: 1;
+      min-height: 200px;
+      padding: 16px 18px !important;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0;
     }
     .reel-card.spinning { animation: reel-shake 0.1s linear infinite; }
     @keyframes reel-shake {
@@ -100,7 +199,7 @@
       align-self: flex-start;
       padding: 3px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.45);
       font-weight: 700;
       font-size: 11px;
       letter-spacing: 1.5px;
@@ -115,20 +214,61 @@
       display: flex;
       align-items: center;
       color: inherit;
+      word-break: break-word;
     }
-    .pull-row {
-      display: flex;
-      justify-content: center;
-      margin-top: 8px;
-    }
-    .machine-footer {
+
+    /* crank lever */
+    .crank-column {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-top: 6px;
+      justify-content: center;
+      gap: 8px;
+      width: 76px;
+      flex-shrink: 0;
     }
-    .hint { color: var(--text-muted); font-size: 14px; font-weight: 500; text-align: center; }
+    .crank {
+      width: 70px;
+      height: 220px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+    }
+    .crank:focus { outline: none; }
+    .crank-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .crank-arm {
+      transform-origin: 35px 200px;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .crank.pulled .crank-arm {
+      transform: rotate(78deg);
+      transition: transform 0.22s cubic-bezier(0.5, 0, 0.7, 0.2);
+    }
+    .crank-hint {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      text-transform: uppercase;
+    }
+
+    .machine-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 6px;
+    }
+    .hint { color: var(--text-muted); font-size: 14px; font-weight: 600; }
     .pull-count {
       display: inline-flex;
       align-items: center;
@@ -138,12 +278,12 @@
       color: var(--text);
       padding: 4px 14px;
       background: #fde9a8;
-      border: 2px solid #d4a030;
+      border: 2px solid var(--yellow-deep);
       border-radius: 999px;
     }
+
+    /* =============== JOURNAL =============== */
     .journal {
-      width: 100%;
-      max-width: 600px;
       padding: 28px 26px !important;
       display: flex;
       flex-direction: column;
@@ -182,7 +322,7 @@
       width: 26px;
       height: 26px;
       border-radius: 50%;
-      background: var(--primary);
+      background: var(--teal-deep);
       color: #fff;
       display: flex;
       align-items: center;
@@ -190,7 +330,7 @@
       font-weight: 800;
       font-size: 13px;
     }
-    .prompt-block:nth-of-type(2) .prompt-num { background: #f8a6b2; }
+    .prompt-block:nth-of-type(2) .prompt-num { background: var(--yellow-deep); }
     .journal-textarea {
       width: 100%;
       min-height: 140px;
@@ -228,11 +368,21 @@
       color: var(--text-muted);
       font-size: 13px;
       text-align: center;
-      padding-top: 12px;
+      padding-top: 8px;
     }
-    @media (max-width: 520px) {
-      .page { padding: 24px 14px 60px; }
-      .slot-machine, .journal { padding: 22px 18px !important; }
+
+    /* responsive */
+    @media (max-width: 720px) {
+      .top-bar {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .branding { align-items: center; text-align: center; padding-right: 0; }
+      .date-note { align-self: flex-start; margin-left: 6px; }
+      .slot-row { flex-direction: column; }
+      .reels { flex-direction: column; }
+      .crank-column { flex-direction: row; width: 100%; justify-content: center; }
+      .crank { width: 220px; height: 70px; transform: rotate(-90deg); }
     }
   </style>
 </head>
@@ -240,10 +390,10 @@
   <div id="app"></div>
 
   <script type="module">
-    import { createApp, ref, onMounted, watch } from 'vue';
-    import { Title, Card, Button, Time, Divider } from 'animal-island-vue';
+    import { createApp, ref, onMounted, watch, computed } from 'vue';
+    import { Title, Card, Button, Time, Divider, Typewriter, Cursor } from 'animal-island-vue';
 
-    /* ===== Question pools (deep + simple) ===== */
+    /* ================= Question pools ================= */
     const DEEP_QUESTIONS = [
       "If your life were a book, what would the title of this current chapter be?",
       "What does a 'meaningful' day look like to you, in concrete detail?",
@@ -435,45 +585,74 @@
       "What's something you'd like more of tomorrow?",
     ];
 
-    /* ===== helpers ===== */
+    /* ================= helpers ================= */
     const STORAGE = { journal: 'island-journal-', count: 'island-pull-count' };
     const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
     const todayKey = () => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     };
+    const formatYmd = () => {
+      const d = new Date();
+      return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+    };
+    const weekdayCN = () => '星期' + ['日','一','二','三','四','五','六'][new Date().getDay()];
+    const lunarDayCN = (d) => {
+      const ones = ['','一','二','三','四','五','六','七','八','九','十'];
+      if (d <= 10) return '初' + ones[d];
+      if (d === 20) return '二十';
+      if (d === 30) return '三十';
+      if (d < 20) return '十' + ones[d - 10];
+      return '廿' + ones[d - 20];
+    };
+    const lunarStr = () => {
+      try {
+        const fmt = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', { month: 'long', day: 'numeric' });
+        const raw = fmt.format(new Date());
+        const match = raw.match(/(.+月)(\d+)/);
+        if (!match) return '农历 ' + raw;
+        const dayNum = parseInt(match[2], 10);
+        return '农历 ' + match[1] + lunarDayCN(dayNum);
+      } catch (e) { return ''; }
+    };
+
     let audioCtx;
-    const tone = (freq=600, duration=0.12, volume=0.05, type='sine') => {
+    const tone = (freq=600, dur=0.12, vol=0.05, type='sine') => {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         osc.type = type;
         osc.frequency.value = freq;
-        g.gain.setValueAtTime(volume, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        g.gain.setValueAtTime(vol, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
         osc.connect(g).connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
       } catch (e) {}
     };
     const click = () => tone(720, 0.025, 0.035, 'square');
     const jingle = () => [523, 659, 784, 1047].forEach((f,i) => setTimeout(() => tone(f, 0.18, 0.05, 'sine'), i*90));
+    const leverSound = () => { tone(180, 0.2, 0.08, 'sawtooth'); setTimeout(() => tone(120, 0.15, 0.06, 'sawtooth'), 80); };
 
-    /* ===== App ===== */
+    /* ================= App ================= */
     const App = {
-      components: { Title, Card, Button, Time, Divider },
+      components: { Title, Card, Button, Time, Divider, Typewriter, Cursor },
       setup() {
         const dayKey = todayKey();
-        const reel1 = ref('Pull the lever…');
-        const reel2 = ref('…and write what comes up.');
+        const reel1 = ref('准备好后,拉下右边的摇杆 →');
+        const reel2 = ref('Pull the lever to draw a prompt.');
         const spinning1 = ref(false);
         const spinning2 = ref(false);
-        const hint = ref('Tap the big PULL button to draw today\'s prompts.');
+        const hint = ref('握住红色把手往下拉一下');
         const pulling = ref(false);
-        const prompts = ref(null);            // [deep, simple] | null
+        const prompts = ref(null);
         const answers = ref(['', '']);
         const pullCount = ref(parseInt(localStorage.getItem(STORAGE.count) || '0', 10));
+        const typewriterTrigger = ref(0);
+
+        const ymdString = formatYmd();
+        const weekdayString = weekdayCN();
+        const lunarString = lunarStr();
 
         // Load saved entry
         const raw = localStorage.getItem(STORAGE.journal + dayKey);
@@ -484,7 +663,7 @@
               prompts.value = obj.prompts;
               reel1.value = obj.prompts[0];
               reel2.value = obj.prompts[1];
-              hint.value = 'Welcome back. Keep writing 🌱';
+              hint.value = '欢迎回来,继续写吧 🌱';
             }
             if (Array.isArray(obj.answers)) {
               const next = obj.answers.slice(0, 2);
@@ -510,7 +689,11 @@
         const handlePull = async () => {
           if (pulling.value) return;
           pulling.value = true;
-          hint.value = '✨ Drawing your prompts…';
+          leverSound();
+          hint.value = '✨ 抽签中…';
+          // reset lever animation after pull
+          setTimeout(() => { pulling.value = false; }, 700);
+
           const deep = pickOne(DEEP_QUESTIONS);
           const simple = pickOne(SIMPLE_QUESTIONS);
           await Promise.all([
@@ -519,11 +702,10 @@
           ]);
           jingle();
           prompts.value = [deep, simple];
-          hint.value = 'Got it! Scroll down to write 🌱';
+          hint.value = '今天的题目来了,往下写吧 🌱';
           pullCount.value = pullCount.value + 1;
           localStorage.setItem(STORAGE.count, String(pullCount.value));
           saveEntry();
-          pulling.value = false;
         };
 
         let saveTimer;
@@ -541,13 +723,13 @@
           const dateStr = new Date().toLocaleDateString(undefined, {
             weekday:'long', year:'numeric', month:'long', day:'numeric',
           });
-          let body = `Island Journal — ${dateStr}\n\n`;
+          let body = `小岛日记 · Island Journal — ${dateStr}\n\n`;
           if (prompts.value) {
             prompts.value.forEach((p, i) => {
               body += `${i+1}. ${p}\n${answers.value[i] || '(empty)'}\n\n`;
             });
           } else {
-            body += '(no prompts yet — pull the lever first)\n';
+            body += '(还没抽签 — 先拉一下摇杆)\n';
           }
           const blob = new Blob([body], { type: 'text/plain' });
           const url = URL.createObjectURL(blob);
@@ -561,72 +743,137 @@
         return {
           reel1, reel2, spinning1, spinning2,
           hint, pulling, prompts, answers, pullCount,
+          typewriterTrigger,
+          ymdString, weekdayString, lunarString,
           handlePull, downloadEntry,
         };
       },
       template: `
-        <div class="page">
-          <div class="stack-tight">
-            <Title color="app-teal" size="large">Island Journal</Title>
-            <p class="tagline">Pull the lever. Reflect. Write what comes up.</p>
-          </div>
-
-          <Card pattern="default" class="slot-machine">
-            <div class="slot-machine-header">
-              <Title color="app-yellow" size="small">DAILY DRAW</Title>
-            </div>
-
-            <Card color="app-teal" :class="['reel-card', { spinning: spinning1 }]">
-              <span class="reel-tag">REFLECT</span>
-              <div class="reel-text">{{ reel1 }}</div>
-            </Card>
-
-            <Card color="app-pink" :class="['reel-card', { spinning: spinning2 }]">
-              <span class="reel-tag">CHECK IN</span>
-              <div class="reel-text">{{ reel2 }}</div>
-            </Card>
-
-            <div class="pull-row">
-              <Button type="primary" size="large" :loading="pulling" @click="handlePull">
-                {{ pulling ? 'PULLING…' : '🍃 PULL!' }}
-              </Button>
-            </div>
-
-            <div class="machine-footer">
-              <span class="hint">{{ hint }}</span>
-              <span class="pull-count">🌱 {{ pullCount }} pull{{ pullCount === 1 ? '' : 's' }}</span>
-            </div>
-          </Card>
-
-          <Card pattern="app-yellow" class="journal">
-            <div class="journal-header">
-              <Title color="app-green" size="small">Today's Journal</Title>
-              <Time />
-            </div>
-            <Divider type="dashed-brown" />
-            <div v-if="!prompts" class="empty-hint">🌿 Pull the lever above to get today's prompts.</div>
-            <template v-else>
-              <div v-for="(p, i) in prompts" :key="i" class="prompt-block">
-                <div class="prompt-line">
-                  <span class="prompt-num">{{ i + 1 }}</span>
-                  <span>{{ p }}</span>
+        <Cursor>
+          <div class="page">
+            <!-- TOP BAR -->
+            <header class="top-bar">
+              <!-- left: date note -->
+              <Card pattern="app-yellow" class="date-note">
+                <div class="date-note-tag">
+                  <Title color="app-teal" size="small">今天是</Title>
                 </div>
-                <textarea
-                  class="journal-textarea"
-                  rows="6"
-                  v-model="answers[i]"
-                  placeholder="Write your answer here…"
-                ></textarea>
-              </div>
-            </template>
-            <div class="journal-actions">
-              <Button type="default" size="middle" @click="downloadEntry">💾 Save as .txt</Button>
-            </div>
-            <p class="paper-note">Auto-saves to this browser. Won't disappear if you close the tab.</p>
-          </Card>
+                <div class="date-note-body">
+                  <div class="date-note-ymd">{{ ymdString }}</div>
+                  <div class="date-note-weekday">{{ weekdayString }}</div>
+                  <div v-if="lunarString" class="date-note-lunar">{{ lunarString }}</div>
+                </div>
+              </Card>
 
-          <p class="footer-note">Made on a little island · everything lives in your browser 🍃</p>
-        </div>
+              <!-- right: branding + typewriter -->
+              <div class="branding">
+                <div class="branding-cn">小岛日记</div>
+                <div class="branding-en">Island Journal</div>
+                <p class="typewriter-line">
+                  <Typewriter :trigger="typewriterTrigger" :speed="90">
+                    你好,欢迎来到小岛! 今天想写些什么哩?
+                  </Typewriter>
+                </p>
+              </div>
+            </header>
+
+            <!-- SLOT MACHINE: horizontal reels + lever -->
+            <Card pattern="app-teal" class="slot-machine">
+              <div class="slot-row">
+                <div class="reels">
+                  <Card color="app-yellow" :class="['reel-card', { spinning: spinning1 }]">
+                    <span class="reel-tag">REFLECT</span>
+                    <div class="reel-text">{{ reel1 }}</div>
+                  </Card>
+                  <Card color="app-teal" :class="['reel-card', { spinning: spinning2 }]">
+                    <span class="reel-tag">CHECK IN</span>
+                    <div class="reel-text">{{ reel2 }}</div>
+                  </Card>
+                </div>
+
+                <div class="crank-column">
+                  <div
+                    class="crank"
+                    :class="{ pulled: pulling }"
+                    @click="handlePull"
+                    @keydown.enter.prevent="handlePull"
+                    @keydown.space.prevent="handlePull"
+                    role="button"
+                    aria-label="拉下手摇杆抽签"
+                    tabindex="0"
+                  >
+                    <svg class="crank-svg" viewBox="0 0 70 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <defs>
+                        <linearGradient id="stemGrad" x1="0" x2="1">
+                          <stop offset="0%" stop-color="#8b6240"/>
+                          <stop offset="50%" stop-color="#d4a370"/>
+                          <stop offset="100%" stop-color="#8b6240"/>
+                        </linearGradient>
+                        <radialGradient id="ballGrad" cx="35%" cy="35%">
+                          <stop offset="0%" stop-color="#ff8a6e"/>
+                          <stop offset="55%" stop-color="#e05a5a"/>
+                          <stop offset="100%" stop-color="#7a1818"/>
+                        </radialGradient>
+                        <linearGradient id="baseGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stop-color="#a06d3f"/>
+                          <stop offset="100%" stop-color="#5c3d1f"/>
+                        </linearGradient>
+                      </defs>
+                      <!-- base mount -->
+                      <rect x="10" y="186" width="50" height="26" rx="6" fill="url(#baseGrad)" stroke="#3d2812" stroke-width="2.5"/>
+                      <rect x="14" y="190" width="42" height="4" rx="2" fill="rgba(255,255,255,0.18)"/>
+                      <!-- lever arm (rotates on .pulled) -->
+                      <g class="crank-arm">
+                        <rect x="30" y="36" width="10" height="166" rx="5" fill="url(#stemGrad)" stroke="#3d2812" stroke-width="2"/>
+                        <!-- decorative band -->
+                        <rect x="28" y="120" width="14" height="6" fill="#3d2812" opacity="0.5" rx="2"/>
+                        <!-- ball -->
+                        <circle cx="35" cy="22" r="20" fill="url(#ballGrad)" stroke="#3d2812" stroke-width="2.5"/>
+                        <ellipse cx="29" cy="16" rx="5" ry="7" fill="#fff" opacity="0.35"/>
+                      </g>
+                    </svg>
+                  </div>
+                  <span class="crank-hint">PULL ↓</span>
+                </div>
+              </div>
+
+              <div class="machine-footer">
+                <span class="hint">{{ hint }}</span>
+                <span class="pull-count">🌱 {{ pullCount }} pull{{ pullCount === 1 ? '' : 's' }}</span>
+              </div>
+            </Card>
+
+            <!-- JOURNAL -->
+            <Card pattern="default" class="journal">
+              <div class="journal-header">
+                <Title color="app-yellow" size="small">Today's Journal</Title>
+                <Time />
+              </div>
+              <Divider type="dashed-brown" />
+              <div v-if="!prompts" class="empty-hint">🌿 拉一下右边的摇杆,抽取今天的题目。</div>
+              <template v-else>
+                <div v-for="(p, i) in prompts" :key="i" class="prompt-block">
+                  <div class="prompt-line">
+                    <span class="prompt-num">{{ i + 1 }}</span>
+                    <span>{{ p }}</span>
+                  </div>
+                  <textarea
+                    class="journal-textarea"
+                    rows="6"
+                    v-model="answers[i]"
+                    placeholder="在这里写下你的想法…"
+                  ></textarea>
+                </div>
+              </template>
+              <div class="journal-actions">
+                <Button type="default" size="middle" @click="downloadEntry">💾 Save as .txt</Button>
+              </div>
+              <p class="paper-note">自动保存到这台浏览器 · 关掉网页也不会丢</p>
+            </Card>
+
+            <p class="footer-note">Made on a little island · 一切都存在你的浏览器里 🍃</p>
+          </div>
+        </Cursor>
       `
     };
 
