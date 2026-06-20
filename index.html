@@ -10,51 +10,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js" onload="Babel.registerPreset('react-classic', { presets: [[Babel.availablePresets.react, { runtime: 'classic' }]] });"></script>
+  <!-- Real animal-island-vue stylesheet -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animal-island-vue@0.2.1/dist/index.css" />
+
+  <!-- Importmap: bare specifiers resolve to ESM CDN URLs -->
+  <script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3.4.27/dist/vue.esm-browser.prod.js",
+      "animal-island-vue": "https://esm.sh/animal-island-vue@0.2.1?external=vue"
+    }
+  }
+  </script>
 
   <style>
     :root {
       --primary: #19c8b9;
-      --primary-hover: #3dd4c6;
-      --primary-active: #11a89b;
-      --primary-bg: #e6f9f6;
       --text: #794f27;
       --text-body: #725d42;
-      --text-secondary: #9f927d;
       --text-muted: #8a7b66;
-      --text-disabled: #c4b89e;
       --bg: #f8f8f0;
       --bg-content: rgb(247, 243, 223);
-      --bg-disabled: #f0ece2;
       --border: #c4b89e;
-      --border-hover: #a89878;
-      --border-strong: #9f927d;
-      --success: #6fba2c;
-      --success-active: #5a9e1e;
-      --warning: #f5c31c;
-      --warning-active: #dba90e;
-      --error: #e05a5a;
-      --error-active: #c94444;
-      --focus-yellow: #ffcc00;
-      --focus-yellow-d: #e0b800;
-      --focus-yellow-radio: #f5c31c;
-      --shadow-btn: #bdaea0;
-      --shadow-input: #d4c9b4;
-      --shadow-switch: #5a9e1e;
-      --r-sm: 12px;
-      --r-base: 18px;
-      --r-lg: 24px;
-      --r-pill: 50px;
-      --ease: cubic-bezier(0.4, 0, 0.2, 1);
-      --d-fast: 0.15s;
-      --d-base: 0.25s;
-      --d-slow: 0.35s;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body {
       background: var(--bg);
       color: var(--text-body);
@@ -63,10 +42,7 @@
       letter-spacing: 0.01em;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
-
-    /* ======= LAYOUT ======= */
     .page {
       max-width: 680px;
       margin: 0 auto;
@@ -76,10 +52,13 @@
       align-items: center;
       gap: 28px;
     }
-    .stack-tight { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
-    .stack { display: flex; flex-direction: column; gap: 16px; }
-    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .row-center { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .stack-tight {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+    }
     .tagline {
       color: var(--text-body);
       font-weight: 500;
@@ -87,395 +66,28 @@
       max-width: 480px;
       line-height: 1.55;
     }
-
-    /* ======= TITLE (ribbon banner) ======= */
-    .island-title {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 2em;
-      padding: 0 1.6em;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: 0.04em;
-      filter: drop-shadow(0 0.08em 0.12em rgba(0,0,0,0.05));
-    }
-    .island-title-small { font-size: 14px; }
-    .island-title-middle { font-size: 20px; }
-    .island-title-large { font-size: 28px; }
-    .island-title .ribbonText {
-      position: relative;
-      z-index: 4;
-      font-weight: 900;
-      padding-top: 0.11em;
-      color: var(--rt);
-    }
-    .island-title .ribbonBack {
-      position: absolute;
-      width: 1.7em;
-      height: 1.7em;
-      bottom: -0.4em;
-      background: var(--rb);
-      z-index: 1;
-    }
-    .island-title .ribbonBack.left  { left: -0.85em; clip-path: polygon(100% 0%, 100% 100%, 0% 100%, 30% 50%, 0% 0%); }
-    .island-title .ribbonBack.right { right: -0.85em; clip-path: polygon(0% 0%, 100% 0%, 70% 50%, 100% 100%, 0% 100%); }
-    .island-title .ribbonFold {
-      position: absolute;
-      top: calc(100% - 0.04em);
-      width: 0;
-      height: 0;
-      z-index: 2;
-    }
-    .island-title .ribbonFold.left  { left: 0; border-width: 0 0.95em 0.45em 0; border-style: solid; border-color: transparent var(--rk) transparent transparent; }
-    .island-title .ribbonFold.right { right: 0; border-width: 0 0 0.45em 0.95em; border-style: solid; border-color: transparent transparent transparent var(--rk); }
-    .island-title .ribbonFront {
-      position: absolute;
-      inset: 0 0.1em;
-      border-radius: 0.2em;
-      background: var(--rf);
-      transform: perspective(11.5em) rotateX(3deg);
-      box-shadow: inset 0 -0.06em 0 rgba(0,0,0,0.05);
-      z-index: 3;
-    }
-
-    /* ======= BUTTON ======= */
-    .island-btn {
-      font-family: 'Nunito', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      line-height: 1;
-      border-width: 2px;
-      border-style: solid;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform var(--d-fast) var(--ease), box-shadow var(--d-fast) var(--ease), color var(--d-fast) var(--ease), border-color var(--d-fast) var(--ease), background var(--d-fast) var(--ease);
-      white-space: nowrap;
-      user-select: none;
-    }
-    .island-btn-small  { height: 32px; padding: 0 16px; font-size: 12px; border-radius: 16px; }
-    .island-btn-middle { height: 45px; padding: 0 20px; font-size: 14px; border-radius: 50px; }
-    .island-btn-large  { height: 48px; padding: 0 32px; font-size: 16px; border-radius: 24px; }
-
-    .island-btn-primary {
-      color: var(--text);
-      background: var(--bg);
-      border-color: var(--bg);
-      box-shadow: 0 5px 0 0 var(--shadow-btn);
-    }
-    .island-btn-primary:hover:not(:disabled) { box-shadow: 0 6px 0 0 var(--shadow-btn); transform: translateY(-1px); }
-    .island-btn-primary:active:not(:disabled) { box-shadow: 0 1px 0 0 var(--shadow-btn); transform: translateY(2px); }
-
-    .island-btn-danger {
-      color: #fff;
-      background: var(--error);
-      border-color: var(--error);
-      box-shadow: 0 5px 0 0 var(--error-active);
-    }
-    .island-btn-danger:hover:not(:disabled) { box-shadow: 0 6px 0 0 var(--error-active); transform: translateY(-1px); }
-    .island-btn-danger:active:not(:disabled) { box-shadow: 0 1px 0 0 var(--error-active); transform: translateY(2px); }
-
-    .island-btn-default, .island-btn-dashed {
-      background: var(--bg);
-      color: var(--text-body);
-      border-color: var(--border-strong);
-      box-shadow: 0 2px 4px 0 rgba(61,52,40,0.06);
-    }
-    .island-btn-dashed { border-style: dashed; }
-    .island-btn-default:hover:not(:disabled), .island-btn-dashed:hover:not(:disabled) {
-      color: var(--primary); border-color: var(--primary);
-      box-shadow: 0 3px 10px 0 rgba(61,52,40,0.10); transform: translateY(-1px);
-    }
-    .island-btn-default:active:not(:disabled), .island-btn-dashed:active:not(:disabled) {
-      color: var(--primary-active); border-color: var(--primary-active); transform: translateY(0);
-      box-shadow: 0 2px 4px 0 rgba(61,52,40,0.06);
-    }
-
-    .island-btn-text, .island-btn-link {
-      background: transparent; border-color: transparent; color: var(--text-body); box-shadow: none;
-    }
-    .island-btn-text:hover:not(:disabled), .island-btn-link:hover:not(:disabled) { color: var(--primary); }
-    .island-btn-text:active:not(:disabled), .island-btn-link:active:not(:disabled) { color: var(--primary-active); }
-    .island-btn-link { color: var(--primary); text-decoration: underline; }
-
-    .island-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
-    .island-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-    .island-btn-loading {
-      background-color: #0ec4b6;
-      background-image: repeating-linear-gradient(-45deg, #0ec4b6 0 10px, #01b0a7 10px 20px);
-      background-size: 28.28px 28.28px;
-      border: 4px solid #4de2da;
-      color: #fff;
-      box-shadow: none;
-      animation: btn-loading 1s linear infinite;
-    }
-    @keyframes btn-loading { to { background-position: -28.28px 0; } }
-
-    /* ======= CARD ======= */
-    .island-card {
-      background: var(--bg-content);
-      color: var(--text-body);
-      font-weight: 500;
-      padding: 16px 24px;
-      border-radius: 20px;
-      transition: transform var(--d-slow) var(--ease);
-      box-shadow: none;
-    }
-    .island-card:hover { transform: translateY(-2px); }
-    .island-card.no-hover:hover { transform: none; }
-    .island-card-dashed {
-      background: rgb(250, 248, 242);
-      border: 2px dashed #e8dcc8;
-    }
-    .island-card-dashed:hover { border-color: #d4c4a8; transform: none; }
-
-    /* solid colors */
-    .island-card-color-default { background: rgb(247,243,223); color: #725d42; }
-    .island-card-color-app-pink { background: #f8a6b2; color: #fff; }
-    .island-card-color-purple { background: #b77dee; color: #fff; }
-    .island-card-color-app-blue { background: #889df0; color: #fff; }
-    .island-card-color-app-yellow { background: #f7cd67; color: #725d42; }
-    .island-card-color-app-orange { background: #e59266; color: #fff; }
-    .island-card-color-app-teal { background: #82d5bb; color: #fff; }
-    .island-card-color-app-green { background: #8ac68a; color: #fff; }
-    .island-card-color-app-red { background: #fc736d; color: #fff; }
-    .island-card-color-lime-green { background: #d1da49; color: #3d5a1a; }
-    .island-card-color-yellow-green { background: #ecdf52; color: #725d42; }
-    .island-card-color-brown { background: #9a835a; color: #fff; }
-    .island-card-color-warm-peach-pink { background: #e18c6f; color: #fff; }
-
-    /* polka-dot patterns */
-    .island-card-pattern-default {
-      background:
-        radial-gradient(circle, rgba(196, 184, 158, 0.20) 1.5px, transparent 1.5px) 0 0/28px 28px,
-        radial-gradient(circle, rgba(196, 184, 158, 0.13) 1px, transparent 1px) 7px 7px/14px 14px,
-        rgb(247, 243, 223);
-      border: 1.5px solid #c4b89e;
-      color: #725d42;
-    }
-    .island-card-pattern-app-pink {
-      background:
-        radial-gradient(circle, rgba(248, 166, 178, 0.18) 1.5px, transparent 1.5px) 0 0/28px 28px,
-        radial-gradient(circle, rgba(255, 200, 210, 0.12) 1px, transparent 1px) 7px 7px/14px 14px,
-        #fde4e8;
-      border: 1.5px solid #f8a6b2;
-      color: #a85565;
-    }
-    .island-card-pattern-app-teal {
-      background:
-        radial-gradient(circle, rgba(130, 213, 187, 0.20) 1.5px, transparent 1.5px) 0 0/28px 28px,
-        radial-gradient(circle, rgba(180, 230, 210, 0.13) 1px, transparent 1px) 7px 7px/14px 14px,
-        #ddf3eb;
-      border: 1.5px solid #82d5bb;
-      color: #1e6e58;
-    }
-    .island-card-pattern-app-yellow {
-      background:
-        radial-gradient(circle, rgba(247, 205, 103, 0.20) 1.5px, transparent 1.5px) 0 0/28px 28px,
-        radial-gradient(circle, rgba(255, 220, 140, 0.13) 1px, transparent 1px) 7px 7px/14px 14px,
-        #fdf2d4;
-      border: 1.5px solid #f7cd67;
-      color: #7a5e10;
-    }
-    .island-card-pattern-app-green {
-      background:
-        radial-gradient(circle, rgba(138, 198, 138, 0.20) 1.5px, transparent 1.5px) 0 0/28px 28px,
-        radial-gradient(circle, rgba(180, 220, 180, 0.13) 1px, transparent 1px) 7px 7px/14px 14px,
-        #dff0df;
-      border: 1.5px solid #8ac68a;
-      color: #2a6630;
-    }
-    .island-card-pattern-app-blue {
-      background:
-        radial-gradient(circle, rgba(136, 157, 240, 0.18) 1.5px, transparent 1.5px) 0 0/28px 28px,
-        radial-gradient(circle, rgba(180, 200, 250, 0.12) 1px, transparent 1px) 7px 7px/14px 14px,
-        #e3e7fb;
-      border: 1.5px solid #889df0;
-      color: #2a3d8a;
-    }
-
-    /* ======= INPUT / TEXTAREA ======= */
-    .island-input, .island-textarea {
-      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
-      background: rgb(247, 243, 223);
-      color: var(--text-body);
-      font-weight: 500;
-      letter-spacing: 0.01em;
-      border: 2px solid var(--border);
-      transition: border-color var(--d-fast) var(--ease), box-shadow var(--d-fast) var(--ease);
-      outline: none;
-      display: block;
-      width: 100%;
-    }
-    .island-input::placeholder, .island-textarea::placeholder {
-      color: var(--border); font-weight: 400; font-style: italic;
-    }
-    .island-input-small { height: 32px; padding: 0 14px; font-size: 12px; border-radius: 40px; }
-    .island-input-middle { height: 40px; padding: 0 18px; font-size: 14px; border-radius: 50px; }
-    .island-input-large { height: 48px; padding: 0 22px; font-size: 16px; border-radius: 50px; }
-    .island-input:hover, .island-textarea:hover { border-color: var(--border-hover); }
-    .island-input:focus, .island-textarea:focus {
-      border-color: var(--focus-yellow);
-      box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.15);
-    }
-    .island-textarea {
-      padding: 14px 18px;
-      font-size: 14px;
-      line-height: 1.65;
-      border-radius: 22px;
-      resize: vertical;
-      min-height: 140px;
-    }
-
-    /* ======= TIME (HUD clock) ======= */
-    .island-time {
-      display: inline-flex;
-      align-items: center;
-      gap: 24px;
-      padding: 16px 36px;
-      background: linear-gradient(180deg, #fff 0%, #f8f8f0 100%);
-      border: 3px solid #d4cfc3;
-      border-radius: 18px;
-      font-family: 'Nunito', sans-serif;
-    }
-    .island-time .t-date {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding-right: 24px;
-      border-right: 3px solid rgba(159,146,125,0.35);
-    }
-    .island-time .t-weekday {
-      color: #6fba2c;
-      font-weight: 900;
-      font-size: 14px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-    .island-time .t-monthday {
-      color: #8b7355;
-      font-weight: 800;
-      font-size: 22px;
-    }
-    .island-time .t-clock {
-      color: #8b7355;
-      font-weight: 900;
-      font-size: 48px;
-      letter-spacing: 2px;
-      font-variant-numeric: tabular-nums;
-    }
-    .island-time .t-colon {
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    /* ======= WALLET (currency pill) ======= */
-    .island-wallet {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-    .island-wallet-small  { --wallet-pill-w: 96px;  --wallet-pill-h: 32px; --wallet-bag: 38px; --wallet-fz: 12px; --wallet-halo: 3px; padding-top: calc(38px * 0.7); }
-    .island-wallet-medium { --wallet-pill-w: 132px; --wallet-pill-h: 42px; --wallet-bag: 50px; --wallet-fz: 17px; --wallet-halo: 4px; padding-top: calc(50px * 0.7); }
-    .island-wallet-large  { --wallet-pill-w: 176px; --wallet-pill-h: 54px; --wallet-bag: 66px; --wallet-fz: 22px; --wallet-halo: 6px; padding-top: calc(66px * 0.7); }
-    .island-wallet .w-pill {
-      position: relative;
-      width: var(--wallet-pill-w);
-      height: var(--wallet-pill-h);
-      border-radius: 999px;
-      background: #b3a046;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow:
-        inset 0 -6px 0 rgba(91,78,30,0.18),
-        inset 0 0 0 2px rgba(91,78,30,0.12),
-        0 0 0 var(--wallet-halo) #fffbe7,
-        0 6px 14px rgba(91,78,30,0.18);
-    }
-    .island-wallet .w-bag {
-      position: absolute;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-      width: var(--wallet-bag);
-      height: var(--wallet-bag);
-      filter: drop-shadow(0 4px 6px rgba(91,78,30,0.18));
-      z-index: 2;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: calc(var(--wallet-bag) * 0.75);
-      transition: transform 0.5s var(--ease);
-    }
-    .island-wallet:hover .w-bag {
-      animation: walletBagBounce 0.5s var(--ease);
-    }
-    @keyframes walletBagBounce {
-      0%   { transform: translateX(-50%) translateY(0) rotate(0); }
-      35%  { transform: translateX(-50%) translateY(-8px) rotate(-6deg); }
-      70%  { transform: translateX(-50%) translateY(-2px) rotate(3deg); }
-      100% { transform: translateX(-50%) translateY(0) rotate(0); }
-    }
-    .island-wallet .w-value {
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      color: #fff;
-      padding: 0 12px;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-      font-size: var(--wallet-fz);
-      text-shadow: 0 2px 0 rgba(91,78,30,0.55), 0 0 1px rgba(91,78,30,0.55);
-    }
-
-    /* ======= DIVIDER ======= */
-    .island-divider {
-      width: 100%;
-      height: 12px;
-      background: center/contain no-repeat;
-    }
-    .island-divider-dashed-brown {
-      background-image: linear-gradient(to right, var(--border) 0 8px, transparent 8px 16px);
-      background-size: 16px 2px;
-      background-repeat: repeat-x;
-      background-position: center;
-    }
-    .island-divider-line-brown {
-      background: linear-gradient(to right, transparent 0%, var(--border) 15%, var(--border) 85%, transparent 100%);
-      height: 2px;
-    }
-
-    /* ======= SLOT MACHINE SPECIFIC ======= */
     .slot-machine {
       width: 100%;
       max-width: 540px;
+      padding: 32px 28px;
       display: flex;
       flex-direction: column;
       gap: 18px;
-      padding: 32px 28px;
     }
     .slot-machine-header {
       display: flex;
       justify-content: center;
-      margin-top: -8px;
+      margin-top: -10px;
       margin-bottom: 4px;
     }
     .reel-card {
       position: relative;
       min-height: 110px;
-      padding: 14px 18px;
+      padding: 14px 18px !important;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      transition: transform var(--d-fast) var(--ease);
+      transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .reel-card.spinning { animation: reel-shake 0.1s linear infinite; }
     @keyframes reel-shake {
@@ -489,7 +101,6 @@
       padding: 3px 12px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.4);
-      font-family: 'Nunito', sans-serif;
       font-weight: 700;
       font-size: 11px;
       letter-spacing: 1.5px;
@@ -505,21 +116,35 @@
       align-items: center;
       color: inherit;
     }
-    .empty-hint {
-      text-align: center;
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 18px;
-      background: rgb(247, 243, 223);
-      border-radius: 18px;
-      border: 2px dashed var(--border);
+    .pull-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
     }
-
-    /* ======= JOURNAL ======= */
+    .machine-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .hint { color: var(--text-muted); font-size: 14px; font-weight: 500; text-align: center; }
+    .pull-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 4px 14px;
+      background: #fde9a8;
+      border: 2px solid #d4a030;
+      border-radius: 999px;
+    }
     .journal {
       width: 100%;
       max-width: 600px;
-      padding: 28px 26px;
+      padding: 28px 26px !important;
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -531,16 +156,16 @@
       flex-wrap: wrap;
       gap: 10px;
     }
-    .journal-date {
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 13px;
+    .empty-hint {
+      text-align: center;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 18px;
+      background: rgb(247, 243, 223);
+      border-radius: 18px;
+      border: 2px dashed var(--border);
     }
-    .prompt-block {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .prompt-block { display: flex; flex-direction: column; gap: 8px; }
     .prompt-line {
       display: flex;
       align-items: flex-start;
@@ -562,21 +187,42 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Nunito', sans-serif;
       font-weight: 800;
       font-size: 13px;
     }
-    .prompt-block:nth-child(2) .prompt-num { background: #f8a6b2; }
+    .prompt-block:nth-of-type(2) .prompt-num { background: #f8a6b2; }
+    .journal-textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 14px 18px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.65;
+      color: var(--text-body);
+      background: rgb(247, 243, 223);
+      border: 2px solid var(--border);
+      border-radius: 22px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .journal-textarea:hover { border-color: #a89878; }
+    .journal-textarea:focus {
+      border-color: #ffcc00;
+      box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.15);
+    }
+    .journal-textarea::placeholder {
+      color: var(--border);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .journal-actions { display: flex; gap: 10px; justify-content: flex-start; }
     .paper-note {
       text-align: center;
       font-size: 12px;
       color: var(--text-muted);
       font-style: italic;
-    }
-    .hint {
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 500;
     }
     .footer-note {
       color: var(--text-muted);
@@ -584,174 +230,20 @@
       text-align: center;
       padding-top: 12px;
     }
-
-    /* ======= RESPONSIVE ======= */
     @media (max-width: 520px) {
       .page { padding: 24px 14px 60px; }
-      .slot-machine, .journal { padding: 22px 18px; }
-      .island-time { padding: 12px 22px; gap: 16px; }
-      .island-time .t-clock { font-size: 36px; }
-      .island-time .t-monthday { font-size: 18px; }
+      .slot-machine, .journal { padding: 22px 18px !important; }
     }
   </style>
 </head>
 <body>
-  <!-- Modal blob clip-path (spec-required, even if Modal not used) -->
-  <svg style="position:absolute;width:0;height:0" aria-hidden="true">
-    <defs>
-      <clipPath id="animal-modal-clip" clipPathUnits="objectBoundingBox">
-        <path d="M0.501,0.005 L0.501,0.005 L0.523,0.005 L0.549,0.006 C0.704,0.01,0.796,0.017,0.825,0.027 L0.827,0.028 C0.872,0.045,0.939,0.044,0.978,0.17 C1,0.254,1,0.365,0.99,0.505 L0.988,0.513 C0.979,0.558,0.971,0.598,0.965,0.633 C0.956,0.689,0.979,0.77,0.964,0.865 C0.953,0.928,0.921,0.966,0.869,0.979 C0.821,0.986,0.773,0.992,0.726,0.995 L0.712,0.996 L0.694,0.997 C0.648,1,0.586,1,0.507,1 L0.501,1 L0.464,1 C0.385,1,0.325,0.998,0.283,0.995 C0.234,0.992,0.184,0.987,0.133,0.979 C0.081,0.966,0.05,0.928,0.039,0.865 C0.023,0.77,0.047,0.689,0.037,0.633 C0.031,0.595,0.023,0.552,0.013,0.505 C-0.006,0.365,-0.002,0.254,0.024,0.17 C0.064,0.045,0.13,0.045,0.174,0.028 L0.175,0.028 C0.204,0.017,0.303,0.009,0.474,0.005 L0.501,0.005" />
-      </clipPath>
-    </defs>
-  </svg>
+  <div id="app"></div>
 
-  <div id="root"></div>
+  <script type="module">
+    import { createApp, ref, onMounted, watch } from 'vue';
+    import { Title, Card, Button, Time, Divider } from 'animal-island-vue';
 
-  <script type="text/babel" data-presets="react-classic,typescript">
-    const { useState, useEffect, useRef, useCallback } = React;
-
-    /* =====================================================
-       ANIMAL-ISLAND-UI COMPONENTS (inline, mirror real API)
-       ===================================================== */
-
-    function Title({ color = 'default-green', size = 'middle', children, style }) {
-      const palette = {
-        'default-green':   { rf: '#27d039', rb: '#20992a', rk: '#115017', rt: '#fff' },
-        'app-pink':        { rf: '#f8a6b2', rb: '#e06880', rk: '#a03060', rt: '#fff' },
-        'purple':          { rf: '#b77dee', rb: '#9050d0', rk: '#5a1a9a', rt: '#fff' },
-        'app-blue':        { rf: '#889df0', rb: '#5068d8', rk: '#2030a0', rt: '#fff' },
-        'app-yellow':      { rf: '#f7cd67', rb: '#d4a030', rk: '#8a6010', rt: '#725d42' },
-        'app-orange':      { rf: '#e59266', rb: '#c06a30', rk: '#7a3a10', rt: '#fff' },
-        'app-teal':        { rf: '#82d5bb', rb: '#40a880', rk: '#186048', rt: '#fff' },
-        'app-green':       { rf: '#8ac68a', rb: '#509050', rk: '#205020', rt: '#fff' },
-        'app-red':         { rf: '#fc736d', rb: '#d43030', rk: '#900010', rt: '#fff' },
-        'lime-green':      { rf: '#d1da49', rb: '#90a010', rk: '#485800', rt: '#3d5a1a' },
-        'yellow-green':    { rf: '#ecdf52', rb: '#c0b010', rk: '#706800', rt: '#725d42' },
-        'brown':           { rf: '#9a835a', rb: '#705830', rk: '#3a2810', rt: '#fff' },
-        'warm-peach-pink': { rf: '#e18c6f', rb: '#b85a30', rk: '#6a2a10', rt: '#fff' },
-      };
-      const p = palette[color] || palette['default-green'];
-      const styleVars = { '--rf': p.rf, '--rb': p.rb, '--rk': p.rk, '--rt': p.rt, ...style };
-      return (
-        <h2 className={`island-title island-title-${size}`} style={styleVars}>
-          <span className="ribbonBack left" />
-          <span className="ribbonBack right" />
-          <span className="ribbonFold left" />
-          <span className="ribbonFold right" />
-          <span className="ribbonFront" />
-          <span className="ribbonText">{children}</span>
-        </h2>
-      );
-    }
-
-    function Button({ type = 'default', size = 'middle', loading, disabled, block, ghost, children, onClick, style, ...rest }) {
-      const classes = [
-        'island-btn',
-        `island-btn-${size}`,
-        `island-btn-${type}`,
-        loading && 'island-btn-loading',
-        block && 'island-btn-block',
-      ].filter(Boolean).join(' ');
-      const composedStyle = { ...(block ? { display: 'flex', width: '100%' } : {}), ...(ghost ? { background: 'transparent', boxShadow: 'none' } : {}), ...style };
-      return (
-        <button
-          className={classes}
-          disabled={disabled || loading}
-          onClick={onClick}
-          style={composedStyle}
-          {...rest}
-        >
-          {children}
-        </button>
-      );
-    }
-
-    function Card({ pattern, color, type, children, className = '', style, onClick }) {
-      const classes = [
-        'island-card',
-        type === 'dashed' && 'island-card-dashed',
-        pattern && pattern !== 'none' && `island-card-pattern-${pattern}`,
-        !pattern && color && `island-card-color-${color}`,
-        className,
-      ].filter(Boolean).join(' ');
-      return <div className={classes} style={style} onClick={onClick}>{children}</div>;
-    }
-
-    function Input({ size = 'middle', value, onChange, placeholder, disabled, style }) {
-      return (
-        <input
-          className={`island-input island-input-${size}`}
-          value={value || ''}
-          onChange={onChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          style={style}
-        />
-      );
-    }
-
-    // Textarea isn't in the spec; styled to match Input tokens.
-    function Textarea({ value, onChange, placeholder, rows = 6, style }) {
-      return (
-        <textarea
-          className="island-textarea"
-          value={value || ''}
-          onChange={onChange}
-          placeholder={placeholder}
-          rows={rows}
-          style={style}
-        />
-      );
-    }
-
-    function Divider({ type = 'line-brown', style }) {
-      return <div className={`island-divider island-divider-${type}`} style={style} />;
-    }
-
-    function Time({ style }) {
-      const [now, setNow] = useState(() => new Date());
-      const [tick, setTick] = useState(false);
-      useEffect(() => {
-        const id = setInterval(() => { setNow(new Date()); setTick(t => !t); }, 1000);
-        return () => clearInterval(id);
-      }, []);
-      const weekday = now.toLocaleDateString('en-US', { weekday: 'short' });
-      const month = now.toLocaleDateString('en-US', { month: 'short' });
-      const day = now.getDate();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      return (
-        <div className="island-time" style={style}>
-          <div className="t-date">
-            <span className="t-weekday">{weekday}</span>
-            <span className="t-monthday">{month} {day}</span>
-          </div>
-          <div className="t-clock">
-            <span>{hours}</span><span className="t-colon" style={{opacity: tick ? 1 : 0}}>:</span><span>{minutes}</span>
-          </div>
-        </div>
-      );
-    }
-
-    function Wallet({ value, size = 'medium', icon = '🍃', thousandSeparator = ',', style }) {
-      let display;
-      if (value === undefined || value === null) display = '00,000';
-      else if (typeof value === 'number') display = thousandSeparator ? value.toLocaleString('en-US').replaceAll(',', thousandSeparator) : String(value);
-      else display = String(value);
-      return (
-        <div className={`island-wallet island-wallet-${size}`} style={style}>
-          <div className="w-bag" aria-hidden>{icon}</div>
-          <div className="w-pill">
-            <span className="w-value">{display}</span>
-          </div>
-        </div>
-      );
-    }
-
-    /* =====================================================
-       QUESTION POOLS
-       ===================================================== */
-
+    /* ===== Question pools (deep + simple) ===== */
     const DEEP_QUESTIONS = [
       "If your life were a book, what would the title of this current chapter be?",
       "What does a 'meaningful' day look like to you, in concrete detail?",
@@ -943,20 +435,13 @@
       "What's something you'd like more of tomorrow?",
     ];
 
-    /* =====================================================
-       HELPERS
-       ===================================================== */
-
-    const STORAGE = {
-      journal: 'island-journal-',
-      count: 'island-pull-count',
-    };
+    /* ===== helpers ===== */
+    const STORAGE = { journal: 'island-journal-', count: 'island-pull-count' };
     const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
     const todayKey = () => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     };
-
     let audioCtx;
     const tone = (freq=600, duration=0.12, volume=0.05, type='sine') => {
       try {
@@ -975,196 +460,177 @@
     const click = () => tone(720, 0.025, 0.035, 'square');
     const jingle = () => [523, 659, 784, 1047].forEach((f,i) => setTimeout(() => tone(f, 0.18, 0.05, 'sine'), i*90));
 
-    /* =====================================================
-       PAGE
-       ===================================================== */
+    /* ===== App ===== */
+    const App = {
+      components: { Title, Card, Button, Time, Divider },
+      setup() {
+        const dayKey = todayKey();
+        const reel1 = ref('Pull the lever…');
+        const reel2 = ref('…and write what comes up.');
+        const spinning1 = ref(false);
+        const spinning2 = ref(false);
+        const hint = ref('Tap the big PULL button to draw today\'s prompts.');
+        const pulling = ref(false);
+        const prompts = ref(null);            // [deep, simple] | null
+        const answers = ref(['', '']);
+        const pullCount = ref(parseInt(localStorage.getItem(STORAGE.count) || '0', 10));
 
-    function SlotMachine({ onPulled, initialPrompts }) {
-      const [reel1, setReel1] = useState(initialPrompts?.[0] || 'Pull the lever…');
-      const [reel2, setReel2] = useState(initialPrompts?.[1] || '…write what comes up.');
-      const [spinning1, setSpinning1] = useState(false);
-      const [spinning2, setSpinning2] = useState(false);
-      const [hint, setHint] = useState(initialPrompts ? 'Welcome back. Keep writing 🌱' : 'Tap the big PULL button to draw today’s prompts.');
-      const [pulling, setPulling] = useState(false);
-      const [pullCount, setPullCount] = useState(() => parseInt(localStorage.getItem(STORAGE.count) || '0', 10));
-
-      const spinReel = (pool, setText, setSpin, finalText, durationMs) => {
-        setSpin(true);
-        const id = setInterval(() => { setText(pickOne(pool)); click(); }, 75);
-        return new Promise(resolve => {
-          setTimeout(() => {
-            clearInterval(id);
-            setSpin(false);
-            setText(finalText);
-            resolve();
-          }, durationMs);
-        });
-      };
-
-      const handlePull = async () => {
-        if (pulling) return;
-        setPulling(true);
-        setHint('✨ Drawing your prompts…');
-        const deep = pickOne(DEEP_QUESTIONS);
-        const simple = pickOne(SIMPLE_QUESTIONS);
-        await Promise.all([
-          spinReel(DEEP_QUESTIONS, setReel1, setSpinning1, deep, 1500),
-          spinReel(SIMPLE_QUESTIONS, setReel2, setSpinning2, simple, 2200),
-        ]);
-        jingle();
-        setHint('Got it! Open your journal below to write 🌱');
-        const nextCount = pullCount + 1;
-        setPullCount(nextCount);
-        localStorage.setItem(STORAGE.count, String(nextCount));
-        onPulled([deep, simple]);
-        setPulling(false);
-      };
-
-      return (
-        <Card pattern="default" className="slot-machine no-hover">
-          <div className="slot-machine-header">
-            <Title color="app-yellow" size="small">DAILY DRAW</Title>
-          </div>
-
-          <Card color="app-teal" className={`reel-card no-hover ${spinning1 ? 'spinning' : ''}`}>
-            <span className="reel-tag">REFLECT</span>
-            <div className="reel-text">{reel1}</div>
-          </Card>
-
-          <Card color="app-pink" className={`reel-card no-hover ${spinning2 ? 'spinning' : ''}`}>
-            <span className="reel-tag">CHECK IN</span>
-            <div className="reel-text">{reel2}</div>
-          </Card>
-
-          <div className="row-center" style={{ marginTop: 8 }}>
-            <Button type="primary" size="large" loading={pulling} onClick={handlePull}>
-              {pulling ? 'PULLING…' : '🍃 PULL!'}
-            </Button>
-          </div>
-
-          <div className="row-center" style={{ marginTop: 4, flexDirection: 'column', gap: 6 }}>
-            <span className="hint">{hint}</span>
-            <Wallet value={pullCount} size="small" icon="🌱" />
-          </div>
-        </Card>
-      );
-    }
-
-    function Journal({ prompts }) {
-      const dayKey = todayKey();
-      const [answers, setAnswers] = useState(['', '']);
-      const saveTimerRef = useRef(null);
-
-      // Load saved on mount + whenever prompts change (e.g., after a pull)
-      useEffect(() => {
+        // Load saved entry
         const raw = localStorage.getItem(STORAGE.journal + dayKey);
         if (raw) {
           try {
             const obj = JSON.parse(raw);
+            if (Array.isArray(obj.prompts) && obj.prompts.length === 2) {
+              prompts.value = obj.prompts;
+              reel1.value = obj.prompts[0];
+              reel2.value = obj.prompts[1];
+              hint.value = 'Welcome back. Keep writing 🌱';
+            }
             if (Array.isArray(obj.answers)) {
               const next = obj.answers.slice(0, 2);
               while (next.length < 2) next.push('');
-              setAnswers(next);
+              answers.value = next;
             }
           } catch (e) {}
         }
-      }, [dayKey]);
 
-      const updateAnswer = (idx, value) => {
-        setAnswers(prev => {
-          const next = [...prev];
-          next[idx] = value;
-          clearTimeout(saveTimerRef.current);
-          saveTimerRef.current = setTimeout(() => {
-            localStorage.setItem(STORAGE.journal + dayKey, JSON.stringify({
-              answers: next, prompts, savedAt: new Date().toISOString(),
-            }));
-          }, 400);
-          return next;
-        });
-      };
-
-      const handleDownload = () => {
-        const dateStr = new Date().toLocaleDateString(undefined, {
-          weekday:'long', year:'numeric', month:'long', day:'numeric',
-        });
-        let body = `Island Journal — ${dateStr}\n\n`;
-        if (prompts) {
-          prompts.forEach((p, i) => {
-            body += `${i+1}. ${p}\n${answers[i] || '(empty)'}\n\n`;
+        const spinReel = (pool, textRef, spinRef, finalText, durationMs) => {
+          spinRef.value = true;
+          const id = setInterval(() => { textRef.value = pickOne(pool); click(); }, 75);
+          return new Promise(resolve => {
+            setTimeout(() => {
+              clearInterval(id);
+              spinRef.value = false;
+              textRef.value = finalText;
+              resolve();
+            }, durationMs);
           });
-        } else {
-          body += '(no prompts yet — pull the lever first)\n';
-        }
-        const blob = new Blob([body], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `island-journal-${dayKey}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
-      };
+        };
 
-      return (
-        <Card pattern="app-yellow" className="journal no-hover">
-          <div className="journal-header">
-            <Title color="app-green" size="small">Today's Journal</Title>
-            <Time />
-          </div>
-          <Divider type="dashed-brown" />
-          {!prompts && (
-            <div className="empty-hint">🌿 Pull the lever above to get today's prompts.</div>
-          )}
-          {prompts && prompts.map((p, i) => (
-            <div className="prompt-block" key={i}>
-              <div className="prompt-line">
-                <span className="prompt-num">{i + 1}</span>
-                <span>{p}</span>
-              </div>
-              <Textarea
-                value={answers[i]}
-                onChange={(e) => updateAnswer(i, e.target.value)}
-                placeholder="Write your answer here…"
-                rows={6}
-              />
-            </div>
-          ))}
-          <div className="row" style={{ justifyContent: 'flex-start', gap: 10 }}>
-            <Button type="default" size="middle" onClick={handleDownload}>💾 Save as .txt</Button>
-          </div>
-          <p className="paper-note">Auto-saves to this browser. Won't disappear if you close the tab.</p>
-        </Card>
-      );
-    }
+        const handlePull = async () => {
+          if (pulling.value) return;
+          pulling.value = true;
+          hint.value = '✨ Drawing your prompts…';
+          const deep = pickOne(DEEP_QUESTIONS);
+          const simple = pickOne(SIMPLE_QUESTIONS);
+          await Promise.all([
+            spinReel(DEEP_QUESTIONS, reel1, spinning1, deep, 1500),
+            spinReel(SIMPLE_QUESTIONS, reel2, spinning2, simple, 2200),
+          ]);
+          jingle();
+          prompts.value = [deep, simple];
+          hint.value = 'Got it! Scroll down to write 🌱';
+          pullCount.value = pullCount.value + 1;
+          localStorage.setItem(STORAGE.count, String(pullCount.value));
+          saveEntry();
+          pulling.value = false;
+        };
 
-    function App() {
-      // Lift current prompts so SlotMachine and Journal stay in sync.
-      const [prompts, setPrompts] = useState(() => {
-        const raw = localStorage.getItem(STORAGE.journal + todayKey());
-        if (!raw) return null;
-        try {
-          const obj = JSON.parse(raw);
-          return (Array.isArray(obj.prompts) && obj.prompts.length === 2) ? obj.prompts : null;
-        } catch (e) { return null; }
-      });
+        let saveTimer;
+        const saveEntry = () => {
+          localStorage.setItem(STORAGE.journal + dayKey, JSON.stringify({
+            answers: answers.value, prompts: prompts.value, savedAt: new Date().toISOString(),
+          }));
+        };
+        watch(answers, () => {
+          clearTimeout(saveTimer);
+          saveTimer = setTimeout(saveEntry, 400);
+        }, { deep: true });
 
-      return (
-        <div className="page">
-          <div className="stack-tight">
+        const downloadEntry = () => {
+          const dateStr = new Date().toLocaleDateString(undefined, {
+            weekday:'long', year:'numeric', month:'long', day:'numeric',
+          });
+          let body = `Island Journal — ${dateStr}\n\n`;
+          if (prompts.value) {
+            prompts.value.forEach((p, i) => {
+              body += `${i+1}. ${p}\n${answers.value[i] || '(empty)'}\n\n`;
+            });
+          } else {
+            body += '(no prompts yet — pull the lever first)\n';
+          }
+          const blob = new Blob([body], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `island-journal-${dayKey}.txt`;
+          a.click();
+          URL.revokeObjectURL(url);
+        };
+
+        return {
+          reel1, reel2, spinning1, spinning2,
+          hint, pulling, prompts, answers, pullCount,
+          handlePull, downloadEntry,
+        };
+      },
+      template: `
+        <div class="page">
+          <div class="stack-tight">
             <Title color="app-teal" size="large">Island Journal</Title>
-            <p className="tagline">Pull the lever. Reflect. Write what comes up.</p>
+            <p class="tagline">Pull the lever. Reflect. Write what comes up.</p>
           </div>
 
-          <SlotMachine onPulled={setPrompts} initialPrompts={prompts} />
+          <Card pattern="default" class="slot-machine">
+            <div class="slot-machine-header">
+              <Title color="app-yellow" size="small">DAILY DRAW</Title>
+            </div>
 
-          <Journal prompts={prompts} />
+            <Card color="app-teal" :class="['reel-card', { spinning: spinning1 }]">
+              <span class="reel-tag">REFLECT</span>
+              <div class="reel-text">{{ reel1 }}</div>
+            </Card>
 
-          <p className="footer-note">Made on a little island · everything lives in your browser 🍃</p>
+            <Card color="app-pink" :class="['reel-card', { spinning: spinning2 }]">
+              <span class="reel-tag">CHECK IN</span>
+              <div class="reel-text">{{ reel2 }}</div>
+            </Card>
+
+            <div class="pull-row">
+              <Button type="primary" size="large" :loading="pulling" @click="handlePull">
+                {{ pulling ? 'PULLING…' : '🍃 PULL!' }}
+              </Button>
+            </div>
+
+            <div class="machine-footer">
+              <span class="hint">{{ hint }}</span>
+              <span class="pull-count">🌱 {{ pullCount }} pull{{ pullCount === 1 ? '' : 's' }}</span>
+            </div>
+          </Card>
+
+          <Card pattern="app-yellow" class="journal">
+            <div class="journal-header">
+              <Title color="app-green" size="small">Today's Journal</Title>
+              <Time />
+            </div>
+            <Divider type="dashed-brown" />
+            <div v-if="!prompts" class="empty-hint">🌿 Pull the lever above to get today's prompts.</div>
+            <template v-else>
+              <div v-for="(p, i) in prompts" :key="i" class="prompt-block">
+                <div class="prompt-line">
+                  <span class="prompt-num">{{ i + 1 }}</span>
+                  <span>{{ p }}</span>
+                </div>
+                <textarea
+                  class="journal-textarea"
+                  rows="6"
+                  v-model="answers[i]"
+                  placeholder="Write your answer here…"
+                ></textarea>
+              </div>
+            </template>
+            <div class="journal-actions">
+              <Button type="default" size="middle" @click="downloadEntry">💾 Save as .txt</Button>
+            </div>
+            <p class="paper-note">Auto-saves to this browser. Won't disappear if you close the tab.</p>
+          </Card>
+
+          <p class="footer-note">Made on a little island · everything lives in your browser 🍃</p>
         </div>
-      );
-    }
+      `
+    };
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    createApp(App).mount('#app');
   </script>
 </body>
 </html>
