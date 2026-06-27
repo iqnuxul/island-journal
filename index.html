@@ -73,13 +73,14 @@
     .cabinet-img.is-hidden { visibility: hidden; }
     .cabinet-img-dynamic { z-index: 2; }
 
-    /* Reel text overlays — sit right inside the cylinder's two screens */
+    /* Reel text overlays — sit right inside the cylinder's two screens.
+       display:grid + place-items:center reliably centers multi-line text
+       (display:flex + align-items:center can mis-center wrapping text). */
     .reel-text {
       position: absolute;
       z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
       padding: 6px 4px;
       text-align: center;
       font-family: 'Nunito', 'Noto Sans SC', sans-serif;
@@ -252,8 +253,8 @@
       />
       <!-- dynamic .cabinet-img-dynamic is created/removed by JS each click -->
 
-      <div class="reel-text reel-text-left"  id="reel1">准备好后,点摇杆 →</div>
-      <div class="reel-text reel-text-right" id="reel2">Tap the lever to draw.</div>
+      <div class="reel-text reel-text-left"  id="reel1"></div>
+      <div class="reel-text reel-text-right" id="reel2"></div>
 
       <button class="crank-hit" id="crankBtn" aria-label="拉摇杆"></button>
     </div>
