@@ -91,9 +91,12 @@
       word-break: break-word;
       overflow: hidden;
     }
-    /* Tuned to the two inner "screens" of the cylinder (the red-boxed area) */
-    .reel-text-left  { left: 17%; width: 19%; top: 43%; height: 31%; }
-    .reel-text-right { left: 39%; width: 19%; top: 43%; height: 31%; }
+    /* Tuned to the two inner "screens" of the cylinder (the red-boxed area).
+       The cylinder body sits in the upper half of the square cabinet (~18-58%
+       of cabinet height), so screen text needs top in the high-20s, not the
+       40s, to land inside the panels rather than below them. */
+    .reel-text-left  { left: 17%; width: 19%; top: 28%; height: 22%; }
+    .reel-text-right { left: 41%; width: 19%; top: 28%; height: 22%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
