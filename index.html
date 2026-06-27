@@ -185,9 +185,11 @@
       object-fit: contain;
       user-select: none;
       pointer-events: none;
-      transition: opacity 0.12s linear;
     }
-    .cabinet-img.is-hidden { opacity: 0; }
+    /* Static stays mounted always — dynamic overlays on top when playing.
+       No opacity transitions; we want instant pixel-identical overlap so
+       there's no flash between the two layers. */
+    .cabinet-img-dynamic { z-index: 1; }
 
     /* The two reel text overlays sit inside the two halves of the cylinder.
        Coordinates are % of the image container. */
@@ -246,13 +248,11 @@
       border: none;
       padding: 0;
       cursor: pointer;
-      border-radius: 28%;
-      transition: background 0.15s;
       z-index: 3;
     }
-    .crank-hit:hover { background: rgba(247, 205, 103, 0.18); }
-    .crank-hit:active { background: rgba(247, 205, 103, 0.28); }
-    .crank-hit:focus { outline: 3px dashed rgba(247, 205, 103, 0.8); outline-offset: -4px; }
+    .crank-hit:hover,
+    .crank-hit:active,
+    .crank-hit:focus { background: transparent; outline: none; }
     .crank-hit:disabled { cursor: wait; }
 
     .machine-footer {
@@ -651,6 +651,13 @@
         const weekdayString = weekdayCN();
         const lunarString = lunarStr();
 
+        // Warm browser cache for the APNG so the first lever click plays
+        // instantly with no network fetch flash.
+        onMounted(() => {
+          const pre = new Image();
+          pre.src = 'slot-machine-original-dynamic.png';
+        });
+
         // Load saved entry
         const raw = localStorage.getItem(STORAGE.journal + dayKey);
         if (raw) {
@@ -788,7 +795,6 @@
               <div class="cabinet">
                 <img
                   class="cabinet-img cabinet-img-static"
-                  :class="{ 'is-hidden': showDynamic }"
                   src="slot-machine-original-static.png"
                   alt="老虎机静态图"
                   draggable="false"
@@ -797,7 +803,7 @@
                   v-if="showDynamic"
                   class="cabinet-img cabinet-img-dynamic"
                   :key="dynamicKey"
-                  :src="'slot-machine-original-dynamic.png?t=' + dynamicKey"
+                  src="slot-machine-original-dynamic.png"
                   alt="老虎机拉杆动画"
                   draggable="false"
                 />
