@@ -161,104 +161,99 @@
     }
     @keyframes caret { 50% { opacity: 0; } }
 
-    /* =============== SLOT MACHINE =============== */
-    .slot-machine {
-      padding: 28px 26px !important;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .slot-row {
-      display: flex;
-      gap: 16px;
-      align-items: stretch;
-    }
-    .reels {
-      flex: 1;
-      display: flex;
-      gap: 14px;
-      min-width: 0;
-    }
-    .reel-card {
-      flex: 1;
-      min-height: 200px;
-      padding: 16px 18px !important;
+    /* =============== HAND-DRAWN CABINET (image-based) =============== */
+    .cabinet-wrap {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      min-width: 0;
     }
-    .reel-card.spinning { animation: reel-shake 0.1s linear infinite; }
-    @keyframes reel-shake {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
-    }
-    .reel-tag {
-      display: inline-flex;
-      align-items: center;
-      align-self: flex-start;
-      padding: 3px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.45);
-      font-weight: 700;
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      color: inherit;
-      border: 1.5px solid currentColor;
-    }
-    .reel-text {
-      font-size: 15px;
-      line-height: 1.55;
-      font-weight: 600;
-      flex: 1;
-      display: flex;
-      align-items: center;
-      color: inherit;
-      word-break: break-word;
-    }
-
-    /* crank lever */
-    .crank-column {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 76px;
-      flex-shrink: 0;
-    }
-    .crank {
-      width: 70px;
-      height: 220px;
+    .cabinet {
       position: relative;
-      cursor: pointer;
-      user-select: none;
-      touch-action: none;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 640px;
+      margin: 0 auto;
     }
-    .crank:focus { outline: none; }
-    .crank-svg {
+    .cabinet-img {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
+      object-fit: contain;
+      user-select: none;
+      pointer-events: none;
+      transition: opacity 0.12s linear;
     }
-    .crank-arm {
-      transform-origin: 35px 200px;
-      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .cabinet-img.is-hidden { opacity: 0; }
+
+    /* The two reel text overlays sit inside the two halves of the cylinder.
+       Coordinates are % of the image container. */
+    .reel-text {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      text-align: center;
+      gap: 8px;
+      top: 23%;
+      height: 34%;
+      pointer-events: none;
     }
-    .crank.pulled .crank-arm {
-      transform: rotate(78deg);
-      transition: transform 0.22s cubic-bezier(0.5, 0, 0.7, 0.2);
+    .reel-text-left  { left: 13%;  width: 23%; }
+    .reel-text-right { left: 42%;  width: 23%; }
+    .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
+    @keyframes reel-shake {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
     }
-    .crank-hint {
+    .reel-tag-mini {
+      display: inline-flex;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-weight: 800;
       font-size: 10px;
-      font-weight: 700;
       letter-spacing: 1.5px;
-      color: var(--text-muted);
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      text-transform: uppercase;
+      border: 1.5px solid #3d2812;
+      color: #3d2812;
     }
+    .reel-text-left  .reel-tag-mini { background: rgba(247, 205, 103, 0.65); border-color: #7a5e10; color: #5c4408; }
+    .reel-text-right .reel-tag-mini { background: rgba(130, 213, 187, 0.65); border-color: #1e6e58; color: #155544; }
+    .reel-body {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.45;
+      color: #1f1206;
+      word-break: break-word;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+    }
+
+    /* Invisible click area over the lever (top-right region of the image) */
+    .crank-hit {
+      position: absolute;
+      left: 60%;
+      top: 0%;
+      width: 35%;
+      height: 45%;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 28%;
+      transition: background 0.15s;
+      z-index: 3;
+    }
+    .crank-hit:hover { background: rgba(247, 205, 103, 0.18); }
+    .crank-hit:active { background: rgba(247, 205, 103, 0.28); }
+    .crank-hit:focus { outline: 3px dashed rgba(247, 205, 103, 0.8); outline-offset: -4px; }
+    .crank-hit:disabled { cursor: wait; }
 
     .machine-footer {
       display: flex;
@@ -639,16 +634,18 @@
       components: { Title, Card, Button, Time, Divider, Typewriter, Cursor },
       setup() {
         const dayKey = todayKey();
-        const reel1 = ref('准备好后,拉下右边的摇杆 →');
-        const reel2 = ref('Pull the lever to draw a prompt.');
+        const reel1 = ref('准备好后,点摇杆 →');
+        const reel2 = ref('Tap the lever to draw.');
         const spinning1 = ref(false);
         const spinning2 = ref(false);
-        const hint = ref('握住红色把手往下拉一下');
+        const hint = ref('点击爪子手柄,拉一下');
         const pulling = ref(false);
         const prompts = ref(null);
         const answers = ref(['', '']);
         const pullCount = ref(parseInt(localStorage.getItem(STORAGE.count) || '0', 10));
         const typewriterTrigger = ref(0);
+        const showDynamic = ref(false);
+        const dynamicKey = ref(0);
 
         const ymdString = formatYmd();
         const weekdayString = weekdayCN();
@@ -691,8 +688,10 @@
           pulling.value = true;
           leverSound();
           hint.value = '✨ 抽签中…';
-          // reset lever animation after pull
-          setTimeout(() => { pulling.value = false; }, 700);
+
+          // Swap to dynamic APNG (cache-busted key forces re-fetch + replay)
+          dynamicKey.value = Date.now();
+          showDynamic.value = true;
 
           const deep = pickOne(DEEP_QUESTIONS);
           const simple = pickOne(SIMPLE_QUESTIONS);
@@ -700,12 +699,18 @@
             spinReel(DEEP_QUESTIONS, reel1, spinning1, deep, 1500),
             spinReel(SIMPLE_QUESTIONS, reel2, spinning2, simple, 2200),
           ]);
+
+          // Keep the dynamic image up a beat longer, then swap back so the
+          // lever settles in the static pose before the next pull.
+          setTimeout(() => { showDynamic.value = false; }, 400);
+
           jingle();
           prompts.value = [deep, simple];
           hint.value = '今天的题目来了,往下写吧 🌱';
           pullCount.value = pullCount.value + 1;
           localStorage.setItem(STORAGE.count, String(pullCount.value));
           saveEntry();
+          pulling.value = false;
         };
 
         let saveTimer;
@@ -745,6 +750,7 @@
           hint, pulling, prompts, answers, pullCount,
           typewriterTrigger,
           ymdString, weekdayString, lunarString,
+          showDynamic, dynamicKey,
           handlePull, downloadEntry,
         };
       },
@@ -777,71 +783,47 @@
               </div>
             </header>
 
-            <!-- SLOT MACHINE: horizontal reels + lever -->
-            <Card pattern="app-teal" class="slot-machine">
-              <div class="slot-row">
-                <div class="reels">
-                  <Card color="app-yellow" :class="['reel-card', { spinning: spinning1 }]">
-                    <span class="reel-tag">REFLECT</span>
-                    <div class="reel-text">{{ reel1 }}</div>
-                  </Card>
-                  <Card color="app-teal" :class="['reel-card', { spinning: spinning2 }]">
-                    <span class="reel-tag">CHECK IN</span>
-                    <div class="reel-text">{{ reel2 }}</div>
-                  </Card>
+            <!-- SLOT MACHINE: hand-drawn cabinet image + lever click area -->
+            <div class="cabinet-wrap">
+              <div class="cabinet">
+                <img
+                  class="cabinet-img cabinet-img-static"
+                  :class="{ 'is-hidden': showDynamic }"
+                  src="slot-machine-original-static.png"
+                  alt="老虎机静态图"
+                  draggable="false"
+                />
+                <img
+                  v-if="showDynamic"
+                  class="cabinet-img cabinet-img-dynamic"
+                  :key="dynamicKey"
+                  :src="'slot-machine-original-dynamic.png?t=' + dynamicKey"
+                  alt="老虎机拉杆动画"
+                  draggable="false"
+                />
+
+                <div :class="['reel-text reel-text-left', { spinning: spinning1 }]">
+                  <span class="reel-tag-mini">REFLECT</span>
+                  <div class="reel-body">{{ reel1 }}</div>
+                </div>
+                <div :class="['reel-text reel-text-right', { spinning: spinning2 }]">
+                  <span class="reel-tag-mini">CHECK IN</span>
+                  <div class="reel-body">{{ reel2 }}</div>
                 </div>
 
-                <div class="crank-column">
-                  <div
-                    class="crank"
-                    :class="{ pulled: pulling }"
-                    @click="handlePull"
-                    @keydown.enter.prevent="handlePull"
-                    @keydown.space.prevent="handlePull"
-                    role="button"
-                    aria-label="拉下手摇杆抽签"
-                    tabindex="0"
-                  >
-                    <svg class="crank-svg" viewBox="0 0 70 220" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <defs>
-                        <linearGradient id="stemGrad" x1="0" x2="1">
-                          <stop offset="0%" stop-color="#8b6240"/>
-                          <stop offset="50%" stop-color="#d4a370"/>
-                          <stop offset="100%" stop-color="#8b6240"/>
-                        </linearGradient>
-                        <radialGradient id="ballGrad" cx="35%" cy="35%">
-                          <stop offset="0%" stop-color="#ff8a6e"/>
-                          <stop offset="55%" stop-color="#e05a5a"/>
-                          <stop offset="100%" stop-color="#7a1818"/>
-                        </radialGradient>
-                        <linearGradient id="baseGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#a06d3f"/>
-                          <stop offset="100%" stop-color="#5c3d1f"/>
-                        </linearGradient>
-                      </defs>
-                      <!-- base mount -->
-                      <rect x="10" y="186" width="50" height="26" rx="6" fill="url(#baseGrad)" stroke="#3d2812" stroke-width="2.5"/>
-                      <rect x="14" y="190" width="42" height="4" rx="2" fill="rgba(255,255,255,0.18)"/>
-                      <!-- lever arm (rotates on .pulled) -->
-                      <g class="crank-arm">
-                        <rect x="30" y="36" width="10" height="166" rx="5" fill="url(#stemGrad)" stroke="#3d2812" stroke-width="2"/>
-                        <!-- decorative band -->
-                        <rect x="28" y="120" width="14" height="6" fill="#3d2812" opacity="0.5" rx="2"/>
-                        <!-- ball -->
-                        <circle cx="35" cy="22" r="20" fill="url(#ballGrad)" stroke="#3d2812" stroke-width="2.5"/>
-                        <ellipse cx="29" cy="16" rx="5" ry="7" fill="#fff" opacity="0.35"/>
-                      </g>
-                    </svg>
-                  </div>
-                  <span class="crank-hint">PULL ↓</span>
-                </div>
+                <button
+                  class="crank-hit"
+                  :disabled="pulling"
+                  @click="handlePull"
+                  aria-label="拉下手摇杆抽签"
+                ></button>
               </div>
 
               <div class="machine-footer">
                 <span class="hint">{{ hint }}</span>
                 <span class="pull-count">🌱 {{ pullCount }} pull{{ pullCount === 1 ? '' : 's' }}</span>
               </div>
-            </Card>
+            </div>
 
             <!-- JOURNAL -->
             <Card pattern="default" class="journal">
