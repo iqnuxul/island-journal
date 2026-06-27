@@ -10,26 +10,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Long+Cang&family=Nunito:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animal-island-vue@0.2.1/dist/index.css" />
-
   <link rel="preload" as="image" href="slot-machine-original-dynamic.png" />
-
-  <script type="importmap">
-  {
-    "imports": {
-      "vue": "https://unpkg.com/vue@3.4.27/dist/vue.esm-browser.prod.js",
-      "animal-island-vue": "https://esm.sh/animal-island-vue@0.2.1?external=vue"
-    }
-  }
-  </script>
 
   <style>
     :root {
       --paper: #fcfaf2;
-      --paper-deep: #f5f0e3;
       --ink: #2a1d10;
       --ink-soft: #6b513a;
-      --rule: rgba(60, 40, 20, 0.18);
+      --reflect: #7a5e10;
+      --check: #155544;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,11 +35,8 @@
     body {
       background-color: var(--paper);
       background-image:
-        /* fine paper grain */
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
-        /* larger watercolor mottling */
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.32 0 0 0 0 0.2 0 0 0 0.08 0'/></filter><rect width='100%25' height='100%25' filter='url(%23m)'/></svg>"),
-        /* subtle warm vignette */
         radial-gradient(ellipse at 50% 0%, #fffaf0 0%, transparent 60%),
         radial-gradient(ellipse at 50% 100%, #f0e6d2 0%, transparent 65%);
       background-size: 320px 320px, 1200px 1200px, auto, auto;
@@ -64,7 +50,7 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      gap: 24px;
+      gap: 16px;
     }
 
     /* =============== CABINET =============== */
@@ -87,52 +73,31 @@
     .cabinet-img.is-hidden { visibility: hidden; }
     .cabinet-img-dynamic { z-index: 2; }
 
-    /* Reel text overlays positioned over the cylinder's two halves. */
+    /* Reel text overlays — sit right inside the cylinder's two screens */
     .reel-text {
       position: absolute;
       z-index: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 8px 6px;
+      padding: 6px 4px;
       text-align: center;
-      gap: 8px;
-      top: 26%;
-      height: 30%;
+      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.45;
+      color: #1f1206;
       pointer-events: none;
+      word-break: break-word;
+      overflow: hidden;
     }
-    .reel-text-left  { left: 12%; width: 25%; }
-    .reel-text-right { left: 41%; width: 25%; }
+    /* Tuned to the cylinder's two visible halves in the static image */
+    .reel-text-left  { left: 13%; width: 24%; top: 26%; height: 28%; }
+    .reel-text-right { left: 42%; width: 24%; top: 26%; height: 28%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-2px); }
-    }
-    .reel-tag-mini {
-      display: inline-flex;
-      padding: 2px 10px;
-      border-radius: 999px;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 800;
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      border: 1.5px solid #3d2812;
-      color: #3d2812;
-    }
-    .reel-text-left  .reel-tag-mini { background: rgba(247, 205, 103, 0.65); border-color: #7a5e10; color: #5c4408; }
-    .reel-text-right .reel-tag-mini { background: rgba(130, 213, 187, 0.65); border-color: #1e6e58; color: #155544; }
-    .reel-body {
-      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.4;
-      color: #1f1206;
-      word-break: break-word;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 5;
-      -webkit-box-orient: vertical;
     }
 
     /* Invisible click area over the lever */
@@ -154,16 +119,32 @@
     }
     .crank-hit:disabled { cursor: wait; }
 
-    /* =============== ANSWER AREA — hand-drawn ruled paper =============== */
+    /* =============== REEL LABELS UNDER MACHINE =============== */
+    .reel-labels {
+      display: flex;
+      justify-content: center;
+      gap: clamp(50px, 14vw, 130px);
+      align-items: baseline;
+      margin-top: -16px;
+      margin-bottom: 12px;
+      font-family: 'Caveat', cursive;
+      font-size: 30px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .reel-label-left  { color: var(--reflect); transform: rotate(-2deg); }
+    .reel-label-right { color: var(--check);   transform: rotate(2deg); }
+
+    /* =============== ANSWER AREA — handwritten ruled paper =============== */
     .answers {
       width: 100%;
       max-width: 680px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 32px;
     }
-    .answer-block { display: flex; flex-direction: column; gap: 8px; }
+    .answer-block { display: flex; flex-direction: column; gap: 6px; }
     .answer-prompt {
       font-family: 'Nunito', 'Noto Sans SC', sans-serif;
       font-size: 15px;
@@ -186,8 +167,6 @@
       margin-top: -2px;
     }
 
-    /* Hand-drawn horizontal lines using a wobbly SVG path repeated.
-       The textarea has transparent bg + same line-height so writing sits on the lines. */
     .answer-pad {
       position: relative;
       padding: 0;
@@ -196,7 +175,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='44' viewBox='0 0 600 44'><path d='M5 38 Q 80 36 160 38 T 320 38 T 480 38 T 595 38' fill='none' stroke='%236b513a' stroke-width='1.6' stroke-linecap='round' opacity='0.45'/></svg>");
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='44' viewBox='0 0 600 44'><path d='M5 38 Q 80 36 160 38 T 320 38 T 480 38 T 595 38' fill='none' stroke='%236b513a' stroke-width='1.6' stroke-linecap='round' opacity='0.42'/></svg>");
       background-repeat: repeat-y;
       background-size: 100% 44px;
       background-position: 0 0;
@@ -219,7 +198,7 @@
       letter-spacing: 0.5px;
     }
     .answer-input::placeholder {
-      color: rgba(107, 81, 58, 0.55);
+      color: rgba(107, 81, 58, 0.5);
       font-style: italic;
     }
 
@@ -229,6 +208,22 @@
       justify-content: center;
       padding-top: 8px;
     }
+    .save-btn {
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px;
+      padding: 10px 32px;
+      background: #fff8e7;
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 0 var(--ink);
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+    .save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 0 0 var(--ink); }
+    .save-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--ink); }
 
     .empty-state {
       text-align: center;
@@ -238,15 +233,40 @@
       padding: 36px 20px;
       opacity: 0.75;
     }
+    .empty-state[hidden] { display: none; }
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <main class="page">
+    <!-- CABINET -->
+    <div class="cabinet" id="cabinet">
+      <img
+        class="cabinet-img cabinet-img-static"
+        id="staticImg"
+        src="slot-machine-original-static.png"
+        alt="老虎机"
+        draggable="false"
+      />
+      <!-- dynamic .cabinet-img-dynamic is created/removed by JS each click -->
 
-  <script type="module">
-    import { createApp, ref, onMounted, watch, nextTick } from 'vue';
-    import { Button } from 'animal-island-vue';
+      <div class="reel-text reel-text-left"  id="reel1">准备好后,点摇杆 →</div>
+      <div class="reel-text reel-text-right" id="reel2">Tap the lever to draw.</div>
 
+      <button class="crank-hit" id="crankBtn" aria-label="拉摇杆"></button>
+    </div>
+
+    <!-- Labels below the machine in handwriting -->
+    <div class="reel-labels">
+      <span class="reel-label-left">✦ reflect</span>
+      <span class="reel-label-right">check in ✦</span>
+    </div>
+
+    <!-- Answer area + Save -->
+    <div class="answers" id="answersArea" hidden></div>
+    <div class="empty-state" id="emptyState">pull the lever to begin ✨</div>
+  </main>
+
+  <script>
     /* ================= Question pools ================= */
     const DEEP_QUESTIONS = [
       "If your life were a book, what would the title of this current chapter be?",
@@ -440,12 +460,13 @@
     ];
 
     /* ================= helpers ================= */
-    const STORAGE = { journal: 'island-journal-' };
+    const STORAGE_KEY = 'island-journal-';
     const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
     const todayKey = () => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     };
+    const escapeHtml = (s) => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     let audioCtx;
     const tone = (freq=600, dur=0.12, vol=0.05, type='sine') => {
@@ -461,203 +482,202 @@
         osc.start(); osc.stop(audioCtx.currentTime + dur);
       } catch (e) {}
     };
-    const click = () => tone(720, 0.025, 0.035, 'square');
+    const tick = () => tone(720, 0.025, 0.035, 'square');
     const jingle = () => [523, 659, 784, 1047].forEach((f,i) => setTimeout(() => tone(f, 0.18, 0.05, 'sine'), i*90));
     const leverSound = () => { tone(180, 0.2, 0.08, 'sawtooth'); setTimeout(() => tone(120, 0.15, 0.06, 'sawtooth'), 80); };
 
-    /* ================= App ================= */
-    const App = {
-      components: { Button },
-      setup() {
-        const dayKey = todayKey();
-        const reel1 = ref('准备好后,点摇杆 →');
-        const reel2 = ref('Tap the lever to draw.');
-        const spinning1 = ref(false);
-        const spinning2 = ref(false);
-        const pulling = ref(false);
-        const prompts = ref(null);
-        const answers = ref(['', '']);
-        const showDynamic = ref(false);
-        const dynamicKey = ref(0);
+    /* ================= DOM refs ================= */
+    const cabinetEl   = document.getElementById('cabinet');
+    const staticImg   = document.getElementById('staticImg');
+    const reel1El     = document.getElementById('reel1');
+    const reel2El     = document.getElementById('reel2');
+    const crankBtn    = document.getElementById('crankBtn');
+    const answersArea = document.getElementById('answersArea');
+    const emptyState  = document.getElementById('emptyState');
 
-        // Warm the APNG into browser cache so first click plays instantly
-        onMounted(() => {
-          const pre = new Image();
-          pre.src = 'slot-machine-original-dynamic.png';
-        });
+    /* ================= State ================= */
+    const dayKey = todayKey();
+    let prompts = null;            // [deepQ, simpleQ] | null
+    let answers = ['', ''];
+    let pulling = false;
 
-        // Load saved entry
-        const raw = localStorage.getItem(STORAGE.journal + dayKey);
-        if (raw) {
-          try {
-            const obj = JSON.parse(raw);
-            if (Array.isArray(obj.prompts) && obj.prompts.length === 2) {
-              prompts.value = obj.prompts;
-              reel1.value = obj.prompts[0];
-              reel2.value = obj.prompts[1];
-            }
-            if (Array.isArray(obj.answers)) {
-              const next = obj.answers.slice(0, 2);
-              while (next.length < 2) next.push('');
-              answers.value = next;
-            }
-          } catch (e) {}
-        }
+    /* ===== Preload the APNG as a Blob so each click can spin a fresh
+            ObjectURL — guarantees the browser decodes from frame 1 with NO
+            network round-trip, no matter how many times the user clicks. ===== */
+    let cachedDynamicBlob = null;
+    fetch('slot-machine-original-dynamic.png')
+      .then(r => r.ok ? r.blob() : null)
+      .then(b => { cachedDynamicBlob = b; })
+      .catch(() => {});
 
-        const spinReel = (pool, textRef, spinRef, finalText, durationMs) => {
-          spinRef.value = true;
-          const id = setInterval(() => { textRef.value = pickOne(pool); click(); }, 75);
-          return new Promise(resolve => {
-            setTimeout(() => {
-              clearInterval(id);
-              spinRef.value = false;
-              textRef.value = finalText;
-              resolve();
-            }, durationMs);
-          });
-        };
+    /* ================= APNG replay logic =================
+       The reliable way to restart an APNG: brand-new <img> element + a unique
+       URL. We use an ObjectURL from the cached Blob (unique per call, zero
+       network), with a cache-busted query-string fallback on cold-cache miss. */
+    function mountFreshDynamic() {
+      // remove any old dynamic img + revoke its url
+      const old = cabinetEl.querySelector('.cabinet-img-dynamic');
+      if (old) {
+        if (old.dataset.objectUrl) URL.revokeObjectURL(old.dataset.objectUrl);
+        old.remove();
+      }
 
-        const handlePull = async () => {
-          if (pulling.value) return;
-          pulling.value = true;
+      const img = document.createElement('img');
+      img.className = 'cabinet-img cabinet-img-dynamic';
+      img.alt = 'lever animation';
+      img.draggable = false;
 
-          // CRITICAL: fully unmount any previous dynamic <img> before remounting.
-          // Just bumping :key in the same tick isn't enough — Vue reconciles in
-          // place and the browser reuses the decoded APNG state. Going false →
-          // nextTick → true with a fresh key guarantees a brand-new DOM node
-          // that decodes from frame 1.
-          showDynamic.value = false;
-          await nextTick();
-          dynamicKey.value = Date.now();
-          showDynamic.value = true;
+      if (cachedDynamicBlob) {
+        const u = URL.createObjectURL(cachedDynamicBlob);
+        img.src = u;
+        img.dataset.objectUrl = u;
+      } else {
+        img.src = 'slot-machine-original-dynamic.png?t=' + Date.now();
+      }
+      // insert before reel text so it sits in the right z layer
+      cabinetEl.insertBefore(img, reel1El);
+    }
+    function removeDynamic() {
+      const img = cabinetEl.querySelector('.cabinet-img-dynamic');
+      if (!img) return;
+      if (img.dataset.objectUrl) URL.revokeObjectURL(img.dataset.objectUrl);
+      img.remove();
+    }
 
-          leverSound();
+    /* ================= Spin a single reel ================= */
+    function spinReel(textEl, pool, finalText, durationMs) {
+      textEl.classList.add('spinning');
+      const id = setInterval(() => { textEl.textContent = pickOne(pool); tick(); }, 75);
+      return new Promise(resolve => {
+        setTimeout(() => {
+          clearInterval(id);
+          textEl.classList.remove('spinning');
+          textEl.textContent = finalText;
+          resolve();
+        }, durationMs);
+      });
+    }
 
-          const deep = pickOne(DEEP_QUESTIONS);
-          const simple = pickOne(SIMPLE_QUESTIONS);
-          await Promise.all([
-            spinReel(DEEP_QUESTIONS, reel1, spinning1, deep, 1500),
-            spinReel(SIMPLE_QUESTIONS, reel2, spinning2, simple, 2200),
-          ]);
+    /* ================= Pull handler ================= */
+    async function handlePull() {
+      if (pulling) return;
+      pulling = true;
 
-          // Let the APNG settle for a beat after the spin, then swap back
-          // to the static cylinder.
-          setTimeout(() => { showDynamic.value = false; }, 350);
+      // 1) Hide static, mount a freshly-decoded APNG
+      staticImg.classList.add('is-hidden');
+      mountFreshDynamic();
 
-          jingle();
-          prompts.value = [deep, simple];
-          pullCount.value += 1;
-          saveEntry();
-          pulling.value = false;
-        };
+      leverSound();
 
-        let saveTimer;
-        const saveEntry = () => {
-          localStorage.setItem(STORAGE.journal + dayKey, JSON.stringify({
-            answers: answers.value, prompts: prompts.value, savedAt: new Date().toISOString(),
-          }));
-        };
-        watch(answers, () => {
-          clearTimeout(saveTimer);
-          saveTimer = setTimeout(saveEntry, 400);
-        }, { deep: true });
+      // 2) Spin reels
+      const deep   = pickOne(DEEP_QUESTIONS);
+      const simple = pickOne(SIMPLE_QUESTIONS);
+      await Promise.all([
+        spinReel(reel1El, DEEP_QUESTIONS, deep, 1500),
+        spinReel(reel2El, SIMPLE_QUESTIONS, simple, 2200),
+      ]);
 
-        const downloadEntry = () => {
-          const dateStr = new Date().toLocaleDateString(undefined, {
-            weekday:'long', year:'numeric', month:'long', day:'numeric',
-          });
-          let body = `小岛日记 · Island Journal — ${dateStr}\n\n`;
-          if (prompts.value) {
-            prompts.value.forEach((p, i) => {
-              body += `${i+1}. ${p}\n${answers.value[i] || '(empty)'}\n\n`;
-            });
-          } else {
-            body += '(还没抽签 — 先拉一下摇杆)\n';
-          }
-          const blob = new Blob([body], { type: 'text/plain' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `island-journal-${dayKey}.txt`;
-          a.click();
-          URL.revokeObjectURL(url);
-        };
+      // 3) Let the APNG settle, then swap back to static cylinder
+      setTimeout(() => {
+        removeDynamic();
+        staticImg.classList.remove('is-hidden');
+      }, 350);
 
-        // pullCount is kept for the saved file numbering but no longer shown
-        const pullCount = ref(0);
+      jingle();
 
-        return {
-          reel1, reel2, spinning1, spinning2,
-          pulling, prompts, answers,
-          showDynamic, dynamicKey,
-          handlePull, downloadEntry,
-        };
-      },
-      template: `
-        <div class="page">
-          <!-- CABINET (image-based slot machine) -->
-          <div class="cabinet">
-            <img
-              class="cabinet-img cabinet-img-static"
-              :class="{ 'is-hidden': showDynamic }"
-              src="slot-machine-original-static.png"
-              alt="老虎机静态图"
-              draggable="false"
-            />
-            <img
-              v-if="showDynamic"
-              class="cabinet-img cabinet-img-dynamic"
-              :key="dynamicKey"
-              src="slot-machine-original-dynamic.png"
-              alt="老虎机拉杆动画"
-              draggable="false"
-            />
+      prompts = [deep, simple];
+      renderAnswers();
+      saveEntry();
+      pulling = false;
+    }
+    crankBtn.addEventListener('click', handlePull);
 
-            <div :class="['reel-text reel-text-left', { spinning: spinning1 }]">
-              <span class="reel-tag-mini">REFLECT</span>
-              <div class="reel-body">{{ reel1 }}</div>
-            </div>
-            <div :class="['reel-text reel-text-right', { spinning: spinning2 }]">
-              <span class="reel-tag-mini">CHECK IN</span>
-              <div class="reel-body">{{ reel2 }}</div>
-            </div>
+    /* ================= Answer rendering / save ================= */
+    let saveTimer;
+    function debouncedSave() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveEntry, 400);
+    }
+    function saveEntry() {
+      localStorage.setItem(STORAGE_KEY + dayKey, JSON.stringify({
+        prompts, answers, savedAt: new Date().toISOString(),
+      }));
+    }
 
-            <button
-              class="crank-hit"
-              :disabled="pulling"
-              @click="handlePull"
-              aria-label="拉下手摇杆抽签"
-            ></button>
+    function renderAnswers() {
+      if (!prompts) {
+        answersArea.hidden = true;
+        emptyState.hidden = false;
+        return;
+      }
+      emptyState.hidden = true;
+      answersArea.hidden = false;
+      answersArea.innerHTML = prompts.map((p, i) => `
+        <div class="answer-block">
+          <div class="answer-prompt">
+            <span class="answer-num">${i + 1}.</span>
+            <span>${escapeHtml(p)}</span>
           </div>
-
-          <!-- ANSWER AREA -->
-          <div class="answers" v-if="prompts">
-            <div v-for="(p, i) in prompts" :key="i" class="answer-block">
-              <div class="answer-prompt">
-                <span class="answer-num">{{ i + 1 }}.</span>
-                <span>{{ p }}</span>
-              </div>
-              <div class="answer-pad">
-                <textarea
-                  class="answer-input"
-                  rows="4"
-                  v-model="answers[i]"
-                  placeholder="here…"
-                ></textarea>
-              </div>
-            </div>
-            <div class="actions">
-              <Button type="primary" size="middle" @click="downloadEntry">💾 Save</Button>
-            </div>
-          </div>
-          <div v-else class="empty-state">
-            pull the lever to begin ✨
+          <div class="answer-pad">
+            <textarea class="answer-input" data-idx="${i}" placeholder="here…"></textarea>
           </div>
         </div>
-      `
-    };
+      `).join('') + `
+        <div class="actions">
+          <button class="save-btn" id="saveBtn">💾 Save</button>
+        </div>
+      `;
+      // Hydrate textarea values + wire input listeners
+      answersArea.querySelectorAll('textarea.answer-input').forEach(ta => {
+        const idx = parseInt(ta.dataset.idx, 10);
+        ta.value = answers[idx] || '';
+        ta.addEventListener('input', () => {
+          answers[idx] = ta.value;
+          debouncedSave();
+        });
+      });
+      document.getElementById('saveBtn').addEventListener('click', downloadEntry);
+    }
 
-    createApp(App).mount('#app');
+    function downloadEntry() {
+      const dateStr = new Date().toLocaleDateString(undefined, {
+        weekday:'long', year:'numeric', month:'long', day:'numeric',
+      });
+      let body = `小岛日记 · Island Journal — ${dateStr}\n\n`;
+      if (prompts) {
+        prompts.forEach((p, i) => {
+          body += `${i+1}. ${p}\n${answers[i] || '(empty)'}\n\n`;
+        });
+      } else {
+        body += '(还没抽签 — 先拉一下摇杆)\n';
+      }
+      const blob = new Blob([body], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `island-journal-${dayKey}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    /* ================= Init: load saved entry ================= */
+    (function loadSaved() {
+      const raw = localStorage.getItem(STORAGE_KEY + dayKey);
+      if (!raw) { renderAnswers(); return; }
+      try {
+        const obj = JSON.parse(raw);
+        if (Array.isArray(obj.prompts) && obj.prompts.length === 2) {
+          prompts = obj.prompts;
+          reel1El.textContent = obj.prompts[0];
+          reel2El.textContent = obj.prompts[1];
+        }
+        if (Array.isArray(obj.answers)) {
+          answers = obj.answers.slice(0, 2);
+          while (answers.length < 2) answers.push('');
+        }
+      } catch (e) {}
+      renderAnswers();
+    })();
   </script>
 </body>
 </html>
