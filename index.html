@@ -4,13 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>小岛日记 · Island Journal</title>
-  <meta name="description" content="拉下手摇杆,抽取今天的日记话题。Pull the lever, draw today's reflection prompts." />
+  <meta name="description" content="拉下手摇杆,抽取今天的日记话题。" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Long+Cang&family=Nunito:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animal-island-vue@0.2.1/dist/index.css" />
+
+  <link rel="preload" as="image" href="slot-machine-original-dynamic.png" />
 
   <script type="importmap">
   {
@@ -23,159 +25,55 @@
 
   <style>
     :root {
-      --primary: #19c8b9;
-      --teal: #82d5bb;
-      --teal-deep: #40a880;
-      --yellow: #f7cd67;
-      --yellow-deep: #d4a030;
-      --text: #794f27;
-      --text-body: #725d42;
-      --text-muted: #8a7b66;
-      --bg: #f8f8f0;
-      --bg-content: rgb(247, 243, 223);
-      --border: #c4b89e;
-      --wood-light: #c9a26b;
-      --wood: #a06d3f;
-      --wood-dark: #5c3d1f;
+      --paper: #fcfaf2;
+      --paper-deep: #f5f0e3;
+      --ink: #2a1d10;
+      --ink-soft: #6b513a;
+      --rule: rgba(60, 40, 20, 0.18);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
-      background: var(--bg);
-      color: var(--text-body);
+      min-height: 100vh;
+      color: var(--ink);
       font-family: 'Nunito', 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
       font-weight: 500;
-      letter-spacing: 0.01em;
-      min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
+
+    /* =============== WATERCOLOR PAPER BACKGROUND =============== */
+    body {
+      background-color: var(--paper);
+      background-image:
+        /* fine paper grain */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+        /* larger watercolor mottling */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.32 0 0 0 0 0.2 0 0 0 0.08 0'/></filter><rect width='100%25' height='100%25' filter='url(%23m)'/></svg>"),
+        /* subtle warm vignette */
+        radial-gradient(ellipse at 50% 0%, #fffaf0 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, #f0e6d2 0%, transparent 65%);
+      background-size: 320px 320px, 1200px 1200px, auto, auto;
+      background-blend-mode: multiply, multiply, normal, multiply;
+    }
+
     .page {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 32px 24px 80px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-    }
-
-    /* =============== TOP BAR =============== */
-    .top-bar {
-      display: grid;
-      grid-template-columns: minmax(220px, 280px) 1fr;
-      gap: 32px;
-      align-items: stretch;
-    }
-
-    /* date note (left) */
-    .date-note {
-      position: relative;
-      padding: 14px 18px 18px !important;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transform: rotate(-1.5deg);
-    }
-    .date-note-tag {
-      position: absolute;
-      top: -14px;
-      left: 18px;
-      z-index: 2;
-    }
-    .date-note-body {
-      margin-top: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      text-align: center;
-    }
-    .date-note-ymd {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      padding: 3px 0;
-    }
-    .date-note-weekday {
-      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
-      font-size: 38px;
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: 4px;
-      line-height: 1.1;
-      margin: 4px 0 6px;
-    }
-    .date-note-lunar {
-      font-size: 13px;
-      color: var(--text-body);
-      padding: 4px 10px;
-      border: 1.5px dashed rgba(120, 90, 50, 0.35);
-      border-radius: 999px;
-      align-self: center;
-      font-weight: 600;
-    }
-
-    /* branding (right) */
-    .branding {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-end;
-      text-align: right;
-      gap: 12px;
-      padding-right: 6px;
-    }
-    .branding-cn {
-      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
-      font-size: clamp(40px, 6.5vw, 60px);
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: 6px;
-      line-height: 1;
-      -webkit-text-stroke: 1.5px transparent;
-      text-shadow:
-        0 2px 0 rgba(120, 80, 30, 0.12),
-        0 4px 0 rgba(120, 80, 30, 0.08);
-    }
-    .branding-en {
-      font-family: 'Nunito', sans-serif;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: var(--teal-deep);
-      text-transform: uppercase;
-    }
-    .typewriter-line {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-body);
-      line-height: 1.6;
-      min-height: 1.6em;
-      display: inline-block;
-      max-width: 100%;
-    }
-    .typewriter-line::after {
-      content: '|';
-      display: inline-block;
-      width: 0;
-      margin-left: 2px;
-      color: var(--teal-deep);
-      animation: caret 0.9s steps(1) infinite;
-    }
-    @keyframes caret { 50% { opacity: 0; } }
-
-    /* =============== HAND-DRAWN CABINET (image-based) =============== */
-    .cabinet-wrap {
-      width: 100%;
       max-width: 760px;
       margin: 0 auto;
+      padding: 28px 20px 60px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      align-items: stretch;
+      gap: 24px;
     }
+
+    /* =============== CABINET =============== */
     .cabinet {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1;
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
+      aspect-ratio: 1 / 1;
     }
     .cabinet-img {
       position: absolute;
@@ -186,28 +84,26 @@
       user-select: none;
       pointer-events: none;
     }
-    /* Static stays mounted always — dynamic overlays on top when playing.
-       No opacity transitions; we want instant pixel-identical overlap so
-       there's no flash between the two layers. */
-    .cabinet-img-dynamic { z-index: 1; }
+    .cabinet-img.is-hidden { visibility: hidden; }
+    .cabinet-img-dynamic { z-index: 2; }
 
-    /* The two reel text overlays sit inside the two halves of the cylinder.
-       Coordinates are % of the image container. */
+    /* Reel text overlays positioned over the cylinder's two halves. */
     .reel-text {
       position: absolute;
+      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px 12px;
+      padding: 8px 6px;
       text-align: center;
       gap: 8px;
-      top: 23%;
-      height: 34%;
+      top: 26%;
+      height: 30%;
       pointer-events: none;
     }
-    .reel-text-left  { left: 13%;  width: 23%; }
-    .reel-text-right { left: 42%;  width: 23%; }
+    .reel-text-left  { left: 12%; width: 25%; }
+    .reel-text-right { left: 41%; width: 25%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
@@ -217,6 +113,7 @@
       display: inline-flex;
       padding: 2px 10px;
       border-radius: 999px;
+      font-family: 'Nunito', sans-serif;
       font-weight: 800;
       font-size: 10px;
       letter-spacing: 1.5px;
@@ -226,18 +123,19 @@
     .reel-text-left  .reel-tag-mini { background: rgba(247, 205, 103, 0.65); border-color: #7a5e10; color: #5c4408; }
     .reel-text-right .reel-tag-mini { background: rgba(130, 213, 187, 0.65); border-color: #1e6e58; color: #155544; }
     .reel-body {
+      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
       font-size: 13px;
       font-weight: 600;
-      line-height: 1.45;
+      line-height: 1.4;
       color: #1f1206;
       word-break: break-word;
       overflow: hidden;
       display: -webkit-box;
-      -webkit-line-clamp: 6;
+      -webkit-line-clamp: 5;
       -webkit-box-orient: vertical;
     }
 
-    /* Invisible click area over the lever (top-right region of the image) */
+    /* Invisible click area over the lever */
     .crank-hit {
       position: absolute;
       left: 60%;
@@ -250,134 +148,95 @@
       cursor: pointer;
       z-index: 3;
     }
-    .crank-hit:hover,
-    .crank-hit:active,
-    .crank-hit:focus { background: transparent; outline: none; }
+    .crank-hit:hover, .crank-hit:active, .crank-hit:focus {
+      background: transparent;
+      outline: none;
+    }
     .crank-hit:disabled { cursor: wait; }
 
-    .machine-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding-top: 6px;
-    }
-    .hint { color: var(--text-muted); font-size: 14px; font-weight: 600; }
-    .pull-count {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      padding: 4px 14px;
-      background: #fde9a8;
-      border: 2px solid var(--yellow-deep);
-      border-radius: 999px;
-    }
-
-    /* =============== JOURNAL =============== */
-    .journal {
-      padding: 28px 26px !important;
+    /* =============== ANSWER AREA — hand-drawn ruled paper =============== */
+    .answers {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 28px;
     }
-    .journal-header {
+    .answer-block { display: flex; flex-direction: column; gap: 8px; }
+    .answer-prompt {
+      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 4px 0 8px;
+      letter-spacing: 0.01em;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
       gap: 10px;
-    }
-    .empty-hint {
-      text-align: center;
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 18px;
-      background: rgb(247, 243, 223);
-      border-radius: 18px;
-      border: 2px dashed var(--border);
-    }
-    .prompt-block { display: flex; flex-direction: column; gap: 8px; }
-    .prompt-line {
-      display: flex;
       align-items: flex-start;
-      gap: 12px;
-      padding: 12px 16px;
-      background: rgb(247, 243, 223);
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      font-weight: 600;
-      color: var(--text);
+      line-height: 1.5;
     }
-    .prompt-num {
+    .answer-num {
       flex-shrink: 0;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--teal-deep);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 13px;
+      font-family: 'Caveat', cursive;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink-soft);
+      margin-top: -2px;
     }
-    .prompt-block:nth-of-type(2) .prompt-num { background: var(--yellow-deep); }
-    .journal-textarea {
+
+    /* Hand-drawn horizontal lines using a wobbly SVG path repeated.
+       The textarea has transparent bg + same line-height so writing sits on the lines. */
+    .answer-pad {
+      position: relative;
+      padding: 0;
+    }
+    .answer-pad::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='44' viewBox='0 0 600 44'><path d='M5 38 Q 80 36 160 38 T 320 38 T 480 38 T 595 38' fill='none' stroke='%236b513a' stroke-width='1.6' stroke-linecap='round' opacity='0.45'/></svg>");
+      background-repeat: repeat-y;
+      background-size: 100% 44px;
+      background-position: 0 0;
+      pointer-events: none;
+    }
+    .answer-input {
+      position: relative;
       width: 100%;
-      min-height: 140px;
-      padding: 14px 18px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1.65;
-      color: var(--text-body);
-      background: rgb(247, 243, 223);
-      border: 2px solid var(--border);
-      border-radius: 22px;
-      resize: vertical;
+      min-height: 176px;
+      padding: 6px 4px 0;
+      background: transparent;
+      border: none;
       outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      resize: vertical;
+      font-family: 'Caveat', 'Long Cang', cursive;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 44px;
+      color: #2a1d10;
+      letter-spacing: 0.5px;
     }
-    .journal-textarea:hover { border-color: #a89878; }
-    .journal-textarea:focus {
-      border-color: #ffcc00;
-      box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.15);
-    }
-    .journal-textarea::placeholder {
-      color: var(--border);
-      font-style: italic;
-      font-weight: 400;
-    }
-    .journal-actions { display: flex; gap: 10px; justify-content: flex-start; }
-    .paper-note {
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
+    .answer-input::placeholder {
+      color: rgba(107, 81, 58, 0.55);
       font-style: italic;
     }
-    .footer-note {
-      color: var(--text-muted);
-      font-size: 13px;
-      text-align: center;
+
+    /* =============== SAVE BUTTON =============== */
+    .actions {
+      display: flex;
+      justify-content: center;
       padding-top: 8px;
     }
 
-    /* responsive */
-    @media (max-width: 720px) {
-      .top-bar {
-        grid-template-columns: 1fr;
-        gap: 18px;
-      }
-      .branding { align-items: center; text-align: center; padding-right: 0; }
-      .date-note { align-self: flex-start; margin-left: 6px; }
-      .slot-row { flex-direction: column; }
-      .reels { flex-direction: column; }
-      .crank-column { flex-direction: row; width: 100%; justify-content: center; }
-      .crank { width: 220px; height: 70px; transform: rotate(-90deg); }
+    .empty-state {
+      text-align: center;
+      font-family: 'Caveat', cursive;
+      font-size: 26px;
+      color: var(--ink-soft);
+      padding: 36px 20px;
+      opacity: 0.75;
     }
   </style>
 </head>
@@ -385,8 +244,8 @@
   <div id="app"></div>
 
   <script type="module">
-    import { createApp, ref, onMounted, watch, computed } from 'vue';
-    import { Title, Card, Button, Time, Divider, Typewriter, Cursor } from 'animal-island-vue';
+    import { createApp, ref, onMounted, watch, nextTick } from 'vue';
+    import { Button } from 'animal-island-vue';
 
     /* ================= Question pools ================= */
     const DEEP_QUESTIONS = [
@@ -581,34 +440,11 @@
     ];
 
     /* ================= helpers ================= */
-    const STORAGE = { journal: 'island-journal-', count: 'island-pull-count' };
+    const STORAGE = { journal: 'island-journal-' };
     const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
     const todayKey = () => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    };
-    const formatYmd = () => {
-      const d = new Date();
-      return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
-    };
-    const weekdayCN = () => '星期' + ['日','一','二','三','四','五','六'][new Date().getDay()];
-    const lunarDayCN = (d) => {
-      const ones = ['','一','二','三','四','五','六','七','八','九','十'];
-      if (d <= 10) return '初' + ones[d];
-      if (d === 20) return '二十';
-      if (d === 30) return '三十';
-      if (d < 20) return '十' + ones[d - 10];
-      return '廿' + ones[d - 20];
-    };
-    const lunarStr = () => {
-      try {
-        const fmt = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', { month: 'long', day: 'numeric' });
-        const raw = fmt.format(new Date());
-        const match = raw.match(/(.+月)(\d+)/);
-        if (!match) return '农历 ' + raw;
-        const dayNum = parseInt(match[2], 10);
-        return '农历 ' + match[1] + lunarDayCN(dayNum);
-      } catch (e) { return ''; }
     };
 
     let audioCtx;
@@ -631,28 +467,20 @@
 
     /* ================= App ================= */
     const App = {
-      components: { Title, Card, Button, Time, Divider, Typewriter, Cursor },
+      components: { Button },
       setup() {
         const dayKey = todayKey();
         const reel1 = ref('准备好后,点摇杆 →');
         const reel2 = ref('Tap the lever to draw.');
         const spinning1 = ref(false);
         const spinning2 = ref(false);
-        const hint = ref('点击爪子手柄,拉一下');
         const pulling = ref(false);
         const prompts = ref(null);
         const answers = ref(['', '']);
-        const pullCount = ref(parseInt(localStorage.getItem(STORAGE.count) || '0', 10));
-        const typewriterTrigger = ref(0);
         const showDynamic = ref(false);
         const dynamicKey = ref(0);
 
-        const ymdString = formatYmd();
-        const weekdayString = weekdayCN();
-        const lunarString = lunarStr();
-
-        // Warm browser cache for the APNG so the first lever click plays
-        // instantly with no network fetch flash.
+        // Warm the APNG into browser cache so first click plays instantly
         onMounted(() => {
           const pre = new Image();
           pre.src = 'slot-machine-original-dynamic.png';
@@ -667,7 +495,6 @@
               prompts.value = obj.prompts;
               reel1.value = obj.prompts[0];
               reel2.value = obj.prompts[1];
-              hint.value = '欢迎回来,继续写吧 🌱';
             }
             if (Array.isArray(obj.answers)) {
               const next = obj.answers.slice(0, 2);
@@ -693,12 +520,18 @@
         const handlePull = async () => {
           if (pulling.value) return;
           pulling.value = true;
-          leverSound();
-          hint.value = '✨ 抽签中…';
 
-          // Swap to dynamic APNG (cache-busted key forces re-fetch + replay)
+          // CRITICAL: fully unmount any previous dynamic <img> before remounting.
+          // Just bumping :key in the same tick isn't enough — Vue reconciles in
+          // place and the browser reuses the decoded APNG state. Going false →
+          // nextTick → true with a fresh key guarantees a brand-new DOM node
+          // that decodes from frame 1.
+          showDynamic.value = false;
+          await nextTick();
           dynamicKey.value = Date.now();
           showDynamic.value = true;
+
+          leverSound();
 
           const deep = pickOne(DEEP_QUESTIONS);
           const simple = pickOne(SIMPLE_QUESTIONS);
@@ -707,15 +540,13 @@
             spinReel(SIMPLE_QUESTIONS, reel2, spinning2, simple, 2200),
           ]);
 
-          // Keep the dynamic image up a beat longer, then swap back so the
-          // lever settles in the static pose before the next pull.
-          setTimeout(() => { showDynamic.value = false; }, 400);
+          // Let the APNG settle for a beat after the spin, then swap back
+          // to the static cylinder.
+          setTimeout(() => { showDynamic.value = false; }, 350);
 
           jingle();
           prompts.value = [deep, simple];
-          hint.value = '今天的题目来了,往下写吧 🌱';
-          pullCount.value = pullCount.value + 1;
-          localStorage.setItem(STORAGE.count, String(pullCount.value));
+          pullCount.value += 1;
           saveEntry();
           pulling.value = false;
         };
@@ -752,116 +583,77 @@
           URL.revokeObjectURL(url);
         };
 
+        // pullCount is kept for the saved file numbering but no longer shown
+        const pullCount = ref(0);
+
         return {
           reel1, reel2, spinning1, spinning2,
-          hint, pulling, prompts, answers, pullCount,
-          typewriterTrigger,
-          ymdString, weekdayString, lunarString,
+          pulling, prompts, answers,
           showDynamic, dynamicKey,
           handlePull, downloadEntry,
         };
       },
       template: `
-        <Cursor>
-          <div class="page">
-            <!-- TOP BAR -->
-            <header class="top-bar">
-              <!-- left: date note -->
-              <Card pattern="app-yellow" class="date-note">
-                <div class="date-note-tag">
-                  <Title color="app-teal" size="small">今天是</Title>
-                </div>
-                <div class="date-note-body">
-                  <div class="date-note-ymd">{{ ymdString }}</div>
-                  <div class="date-note-weekday">{{ weekdayString }}</div>
-                  <div v-if="lunarString" class="date-note-lunar">{{ lunarString }}</div>
-                </div>
-              </Card>
+        <div class="page">
+          <!-- CABINET (image-based slot machine) -->
+          <div class="cabinet">
+            <img
+              class="cabinet-img cabinet-img-static"
+              :class="{ 'is-hidden': showDynamic }"
+              src="slot-machine-original-static.png"
+              alt="老虎机静态图"
+              draggable="false"
+            />
+            <img
+              v-if="showDynamic"
+              class="cabinet-img cabinet-img-dynamic"
+              :key="dynamicKey"
+              src="slot-machine-original-dynamic.png"
+              alt="老虎机拉杆动画"
+              draggable="false"
+            />
 
-              <!-- right: branding + typewriter -->
-              <div class="branding">
-                <div class="branding-cn">小岛日记</div>
-                <div class="branding-en">Island Journal</div>
-                <p class="typewriter-line">
-                  <Typewriter :trigger="typewriterTrigger" :speed="90">
-                    你好,欢迎来到小岛! 今天想写些什么哩?
-                  </Typewriter>
-                </p>
-              </div>
-            </header>
-
-            <!-- SLOT MACHINE: hand-drawn cabinet image + lever click area -->
-            <div class="cabinet-wrap">
-              <div class="cabinet">
-                <img
-                  class="cabinet-img cabinet-img-static"
-                  src="slot-machine-original-static.png"
-                  alt="老虎机静态图"
-                  draggable="false"
-                />
-                <img
-                  v-if="showDynamic"
-                  class="cabinet-img cabinet-img-dynamic"
-                  :key="dynamicKey"
-                  src="slot-machine-original-dynamic.png"
-                  alt="老虎机拉杆动画"
-                  draggable="false"
-                />
-
-                <div :class="['reel-text reel-text-left', { spinning: spinning1 }]">
-                  <span class="reel-tag-mini">REFLECT</span>
-                  <div class="reel-body">{{ reel1 }}</div>
-                </div>
-                <div :class="['reel-text reel-text-right', { spinning: spinning2 }]">
-                  <span class="reel-tag-mini">CHECK IN</span>
-                  <div class="reel-body">{{ reel2 }}</div>
-                </div>
-
-                <button
-                  class="crank-hit"
-                  :disabled="pulling"
-                  @click="handlePull"
-                  aria-label="拉下手摇杆抽签"
-                ></button>
-              </div>
-
-              <div class="machine-footer">
-                <span class="hint">{{ hint }}</span>
-                <span class="pull-count">🌱 {{ pullCount }} pull{{ pullCount === 1 ? '' : 's' }}</span>
-              </div>
+            <div :class="['reel-text reel-text-left', { spinning: spinning1 }]">
+              <span class="reel-tag-mini">REFLECT</span>
+              <div class="reel-body">{{ reel1 }}</div>
+            </div>
+            <div :class="['reel-text reel-text-right', { spinning: spinning2 }]">
+              <span class="reel-tag-mini">CHECK IN</span>
+              <div class="reel-body">{{ reel2 }}</div>
             </div>
 
-            <!-- JOURNAL -->
-            <Card pattern="default" class="journal">
-              <div class="journal-header">
-                <Title color="app-yellow" size="small">Today's Journal</Title>
-                <Time />
-              </div>
-              <Divider type="dashed-brown" />
-              <div v-if="!prompts" class="empty-hint">🌿 拉一下右边的摇杆,抽取今天的题目。</div>
-              <template v-else>
-                <div v-for="(p, i) in prompts" :key="i" class="prompt-block">
-                  <div class="prompt-line">
-                    <span class="prompt-num">{{ i + 1 }}</span>
-                    <span>{{ p }}</span>
-                  </div>
-                  <textarea
-                    class="journal-textarea"
-                    rows="6"
-                    v-model="answers[i]"
-                    placeholder="在这里写下你的想法…"
-                  ></textarea>
-                </div>
-              </template>
-              <div class="journal-actions">
-                <Button type="default" size="middle" @click="downloadEntry">💾 Save as .txt</Button>
-              </div>
-              <p class="paper-note">自动保存到这台浏览器 · 关掉网页也不会丢</p>
-            </Card>
-
-            <p class="footer-note">Made on a little island · 一切都存在你的浏览器里 🍃</p>
+            <button
+              class="crank-hit"
+              :disabled="pulling"
+              @click="handlePull"
+              aria-label="拉下手摇杆抽签"
+            ></button>
           </div>
-        </Cursor>
+
+          <!-- ANSWER AREA -->
+          <div class="answers" v-if="prompts">
+            <div v-for="(p, i) in prompts" :key="i" class="answer-block">
+              <div class="answer-prompt">
+                <span class="answer-num">{{ i + 1 }}.</span>
+                <span>{{ p }}</span>
+              </div>
+              <div class="answer-pad">
+                <textarea
+                  class="answer-input"
+                  rows="4"
+                  v-model="answers[i]"
+                  placeholder="here…"
+                ></textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <Button type="primary" size="middle" @click="downloadEntry">💾 Save</Button>
+            </div>
+          </div>
+          <div v-else class="empty-state">
+            pull the lever to begin ✨
+          </div>
+        </div>
       `
     };
 
