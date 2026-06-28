@@ -219,12 +219,10 @@
     .answer-pad {
       position: relative;
       padding: calc(3% + 5px) calc(10% + 15px);
-      background: radial-gradient(ellipse 78% 92% at 50% 50%,
-        rgba(228, 199, 138, 0.55) 0%,
-        rgba(228, 199, 138, 0.28) 60%,
-        rgba(228, 199, 138, 0.08) 85%,
-        transparent 100%);
-      border-radius: 14px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'><defs><filter id='wc' x='-30%25' y='-30%25' width='160%25' height='160%25'><feTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='3' seed='5' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='48' xChannelSelector='R' yChannelSelector='G'/><feGaussianBlur stdDeviation='9'/></filter><radialGradient id='g' cx='50%25' cy='50%25' r='62%25'><stop offset='0%25' stop-color='%23e4c78a' stop-opacity='0.78'/><stop offset='55%25' stop-color='%23e4c78a' stop-opacity='0.34'/><stop offset='100%25' stop-color='%23e4c78a' stop-opacity='0'/></radialGradient></defs><ellipse cx='200' cy='100' rx='172' ry='86' fill='url(%23g)' filter='url(%23wc)'/></svg>");
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      background-position: center;
     }
     .answer-pad::before {
       content: '';
