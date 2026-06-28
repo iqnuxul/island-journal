@@ -491,13 +491,18 @@
     const escapeHtml = (s) => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     let audioCtx;
-    const initAudio = () => {
+    const initAudio = async () => {
       try {
         if (!audioCtx) {
           audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          if (audioCtx.state === 'suspended') audioCtx.resume();
         }
-      } catch (e) {}
+        if (audioCtx && audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+        return audioCtx;
+      } catch (e) {
+        console.error('Audio init failed:', e);
+      }
     };
     const tone = (freq=600, dur=0.12, vol=0.05, type='sine') => {
       try {
@@ -603,23 +608,23 @@
       pulling = true;
 
       // Initialize audio context early for mobile
-      initAudio();
+      await initAudio();
 
       // 1) Mount a freshly-decoded APNG and wait for it to load
       mountFreshDynamic();
       const dynamicImg = cabinetEl.querySelector('.cabinet-img-dynamic');
 
-      // Hide static image once dynamic is ready
+      // Hide static image once dynamic is ready + extra buffer for mobile
       await new Promise(resolve => {
         if (dynamicImg.complete) {
           staticImg.classList.add('is-hidden');
-          resolve();
+          setTimeout(resolve, 50);
         } else {
           dynamicImg.onload = () => {
             staticImg.classList.add('is-hidden');
-            resolve();
+            setTimeout(resolve, 50);
           };
-          dynamicImg.onerror = resolve;
+          dynamicImg.onerror = () => setTimeout(resolve, 50);
         }
       });
 
@@ -634,10 +639,11 @@
       ]);
 
       // 3) Let the APNG settle, then swap back to static cylinder
+      // Extended timeout for tablets to ensure full animation frames
       setTimeout(() => {
         removeDynamic();
         staticImg.classList.remove('is-hidden');
-      }, 350);
+      }, 500);
 
       jingle();
 
