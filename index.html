@@ -201,30 +201,33 @@
     .answer-pad::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' preserveAspectRatio='none'><defs><filter id='sketch'><feTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='3' result='noise' seed='2'/><feDisplacementMap in='SourceGraphic' in2='noise' scale='8' xChannelSelector='R' yChannelSelector='G'/></filter></defs><rect x='50' y='50' width='900' height='900' fill='none' stroke='%236b513a' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' filter='url(%23sketch)'/><line x1='100' y1='200' x2='900' y2='200' stroke='%236b513a' stroke-width='2' stroke-linecap='round' opacity='0.3' filter='url(%23sketch)'/></svg>");
-      background-repeat: no-repeat;
-      background-size: 85% 100%;
-      background-position: center 0;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1400' preserveAspectRatio='xMidYMid slice'><defs><filter id='sketch'><feTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='3' result='noise' seed='2'/><feDisplacementMap in='SourceGraphic' in2='noise' scale='20' xChannelSelector='R' yChannelSelector='G'/></filter></defs><rect x='40' y='40' width='920' height='1320' fill='none' stroke='%23000000' stroke-width='14' stroke-linecap='round' stroke-linejoin='round' filter='url(%23sketch)'/></svg>");
+      background-repeat: repeat-y;
+      background-size: 100% auto;
+      background-position: 0 0;
       background-attachment: scroll;
       pointer-events: none;
     }
     .answer-input {
       position: relative;
       width: 100%;
-      min-height: auto;
+      min-height: 200px;
       padding: 0;
       background: transparent;
       border: none;
       outline: none;
-      resize: none;
+      resize: vertical;
       font-family: 'Schoolbell', cursive;
       font-size: 18px;
       font-weight: 400;
       line-height: 36px;
       color: #2a1d10;
       letter-spacing: 0.5px;
-      overflow: visible;
+      overflow: auto;
       box-sizing: border-box;
     }
     .answer-input::placeholder {
