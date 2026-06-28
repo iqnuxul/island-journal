@@ -141,6 +141,8 @@
       margin-top: 4px;
       letter-spacing: 2px;
     }
+    .cabinet-date::before { content: '· '; }
+    .cabinet-date::after { content: ' ·'; }
 
     /* =============== REEL LABELS UNDER MACHINE =============== */
     .reel-labels {
@@ -215,12 +217,13 @@
     .answer-input {
       position: relative;
       width: 100%;
-      min-height: 200px;
+      height: 72px;
+      min-height: 72px;
       padding: 0;
       background: transparent;
       border: none;
       outline: none;
-      resize: vertical;
+      resize: none;
       font-family: 'Schoolbell', cursive;
       font-size: 18px;
       font-weight: 400;
@@ -693,10 +696,21 @@
       answersArea.querySelectorAll('textarea.answer-input').forEach(ta => {
         const idx = parseInt(ta.dataset.idx, 10);
         ta.value = answers[idx] || '';
+
+        // Auto-expand height
+        const autoExpand = (e) => {
+          e.style.height = 'auto';
+          e.style.height = Math.max(e.scrollHeight, 72) + 'px';
+        };
+
         ta.addEventListener('input', () => {
           answers[idx] = ta.value;
+          autoExpand(ta);
           debouncedSave();
         });
+
+        // Initial height adjustment
+        autoExpand(ta);
       });
       document.getElementById('saveBtn').addEventListener('click', downloadEntry);
     }
