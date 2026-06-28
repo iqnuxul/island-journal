@@ -77,8 +77,10 @@
       object-fit: contain;
       user-select: none;
       pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.08s ease-out;
     }
-    .cabinet-img.is-hidden { visibility: hidden; }
+    .cabinet-img.is-hidden { opacity: 0; }
     .cabinet-img-dynamic { z-index: 2; }
 
     /* Reel text overlays — sit inside the cylinder's two screens.
@@ -102,8 +104,8 @@
     }
     /* Tuned to match user's red-box annotations — screens positioned
        lower in the visible area of the cylinder. */
-    .reel-text-left  { left: 11%; width: 24%; top: 40%; height: 32%; }
-    .reel-text-right { left: 47%; width: 24%; top: 40%; height: 32%; }
+    .reel-text-left  { left: 16%; width: 24%; top: 40%; height: 32%; }
+    .reel-text-right { left: 42%; width: 24%; top: 40%; height: 32%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
@@ -132,14 +134,15 @@
 
     /* =============== DATE DISPLAY =============== */
     .cabinet-date {
-      text-align: center;
+      text-align: left;
       font-family: 'Mydogfont', cursive;
       font-size: clamp(24px, 5cqi, 40px);
       font-weight: 400;
       color: var(--ink);
-      margin-bottom: -28px;
-      margin-top: 4px;
+      margin-bottom: 16px;
+      margin-top: 0px;
       letter-spacing: 2px;
+      margin-left: 20px;
     }
 
     /* =============== REEL LABELS UNDER MACHINE =============== */
@@ -213,9 +216,9 @@
       border: none;
       outline: none;
       resize: vertical;
-      font-family: 'Caveat', 'Long Cang', cursive;
+      font-family: 'Schoolbell', cursive;
       font-size: 24px;
-      font-weight: 500;
+      font-weight: 400;
       line-height: 44px;
       color: #2a1d10;
       letter-spacing: 0.5px;
@@ -593,9 +596,23 @@
       if (pulling) return;
       pulling = true;
 
-      // 1) Hide static, mount a freshly-decoded APNG
-      staticImg.classList.add('is-hidden');
+      // 1) Mount a freshly-decoded APNG and wait for it to load
       mountFreshDynamic();
+      const dynamicImg = cabinetEl.querySelector('.cabinet-img-dynamic');
+
+      // Hide static image once dynamic is ready
+      await new Promise(resolve => {
+        if (dynamicImg.complete) {
+          staticImg.classList.add('is-hidden');
+          resolve();
+        } else {
+          dynamicImg.onload = () => {
+            staticImg.classList.add('is-hidden');
+            resolve();
+          };
+          dynamicImg.onerror = resolve;
+        }
+      });
 
       leverSound();
 
