@@ -21,7 +21,7 @@
       font-style: normal;
     }
     :root {
-      --paper: #fcfaf2;
+      --paper: #fffaf5;
       --ink: #2a1d10;
       --ink-soft: #6b513a;
       --reflect: #7a5e10;
@@ -189,10 +189,14 @@
       color: var(--ink-soft);
       margin-top: -2px;
     }
+    .answer-block:nth-child(1) .answer-num,
+    .answer-block:nth-child(2) .answer-num {
+      color: #d9534f;
+    }
 
     .answer-pad {
       position: relative;
-      padding: calc(27.27% + 10px) calc(20% + 10px) calc(9.09% + 10px) calc(18.18% + 10px);
+      padding: calc(17.27% + 10px) calc(20% + 10px) calc(9.09% + 10px) calc(18.18% + 10px);
     }
     .answer-pad::before {
       content: '';
@@ -200,8 +204,8 @@
       inset: 0;
       background-image: url("answer%20area.png");
       background-repeat: repeat-y;
-      background-size: 100% auto;
-      background-position: 0 0;
+      background-size: 80% auto;
+      background-position: center 0;
       background-attachment: scroll;
       pointer-events: none;
     }
