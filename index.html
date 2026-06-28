@@ -77,10 +77,8 @@
       object-fit: contain;
       user-select: none;
       pointer-events: none;
-      opacity: 1;
-      transition: opacity 0.08s ease-out;
     }
-    .cabinet-img.is-hidden { opacity: 0; }
+    .cabinet-img.is-hidden { visibility: hidden; }
     .cabinet-img-dynamic { z-index: 2; }
 
     /* Reel text overlays — sit inside the cylinder's two screens.
@@ -134,15 +132,14 @@
 
     /* =============== DATE DISPLAY =============== */
     .cabinet-date {
-      text-align: left;
+      text-align: center;
       font-family: 'Mydogfont', cursive;
       font-size: clamp(24px, 5cqi, 40px);
       font-weight: 400;
       color: var(--ink);
-      margin-bottom: 16px;
-      margin-top: 0px;
+      margin-bottom: -28px;
+      margin-top: 4px;
       letter-spacing: 2px;
-      margin-left: 20px;
     }
 
     /* =============== REEL LABELS UNDER MACHINE =============== */
@@ -494,9 +491,18 @@
     const escapeHtml = (s) => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     let audioCtx;
+    const initAudio = () => {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+      } catch (e) {}
+    };
     const tone = (freq=600, dur=0.12, vol=0.05, type='sine') => {
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        initAudio();
+        if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         osc.type = type;
@@ -595,6 +601,9 @@
     async function handlePull() {
       if (pulling) return;
       pulling = true;
+
+      // Initialize audio context early for mobile
+      initAudio();
 
       // 1) Mount a freshly-decoded APNG and wait for it to load
       mountFreshDynamic();
