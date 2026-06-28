@@ -242,21 +242,21 @@
       padding-top: 8px;
     }
     .save-btn {
-      font-family: 'Caveat', cursive;
-      font-weight: 700;
-      font-size: 22px;
-      letter-spacing: 1px;
-      padding: 10px 32px;
-      background: #fff8e7;
-      color: var(--ink);
-      border: 2px solid var(--ink);
-      border-radius: 999px;
+      width: 200px;
+      height: 200px;
+      padding: 0;
+      background-image: url("save-static.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: transparent;
+      border: none;
       cursor: pointer;
-      box-shadow: 0 4px 0 0 var(--ink);
-      transition: transform 0.08s ease, box-shadow 0.08s ease;
+      box-shadow: none;
+      transition: none;
     }
-    .save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 0 0 var(--ink); }
-    .save-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--ink); }
+    .save-btn:hover { transform: scale(1.05); }
+    .save-btn:active { transform: scale(0.95); }
 
     .empty-state {
       text-align: center;
