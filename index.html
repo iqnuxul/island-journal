@@ -610,23 +610,9 @@
       // Initialize audio context early for mobile
       await initAudio();
 
-      // 1) Mount a freshly-decoded APNG and wait for it to load
+      // 1) Hide static, mount a freshly-decoded APNG
+      staticImg.classList.add('is-hidden');
       mountFreshDynamic();
-      const dynamicImg = cabinetEl.querySelector('.cabinet-img-dynamic');
-
-      // Hide static image once dynamic is ready + extra buffer for mobile
-      await new Promise(resolve => {
-        if (dynamicImg.complete) {
-          staticImg.classList.add('is-hidden');
-          setTimeout(resolve, 50);
-        } else {
-          dynamicImg.onload = () => {
-            staticImg.classList.add('is-hidden');
-            setTimeout(resolve, 50);
-          };
-          dynamicImg.onerror = () => setTimeout(resolve, 50);
-        }
-      });
 
       leverSound();
 
@@ -639,11 +625,10 @@
       ]);
 
       // 3) Let the APNG settle, then swap back to static cylinder
-      // Extended timeout for tablets to ensure full animation frames
       setTimeout(() => {
         removeDynamic();
         staticImg.classList.remove('is-hidden');
-      }, 500);
+      }, 350);
 
       jingle();
 
