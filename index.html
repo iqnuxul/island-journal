@@ -719,8 +719,9 @@
       const saveBtnEl = document.getElementById('saveBtn');
       saveBtnEl.disabled = true;
 
-      // Show save animation with dynamic image
-      saveBtnEl.style.backgroundImage = 'url("save-dynamic.png")';
+      // Show save animation with dynamic image (add timestamp to force reload)
+      const timestamp = Date.now();
+      saveBtnEl.style.backgroundImage = 'url("save-dynamic.png?t=' + timestamp + '")';
       saveBtnEl.style.backgroundSize = 'contain';
       saveBtnEl.style.backgroundRepeat = 'no-repeat';
       saveBtnEl.style.backgroundPosition = 'center';
