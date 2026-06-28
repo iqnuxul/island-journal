@@ -93,10 +93,12 @@
       pointer-events: none;
       word-break: break-word;
     }
-    /* Tuned to the NEW (larger) cylinder image — slot machine now fills
-       most of the canvas, screens are bigger and sit lower. */
-    .reel-text-left  { left: 10%; width: 32%; top: 38%; height: 44%; }
-    .reel-text-right { left: 46%; width: 26%; top: 38%; height: 44%; }
+    /* Tuned to the NEW (larger) cylinder image's two screens — measured
+       directly off the user's red-box annotations. Screens are in the
+       LOWER half of the cabinet (cabinet is 1:1 but cylinder body sits
+       lower in this revised PNG). */
+    .reel-text-left  { left: 11%; width: 27%; top: 48%; height: 34%; }
+    .reel-text-right { left: 42%; width: 27%; top: 48%; height: 34%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
