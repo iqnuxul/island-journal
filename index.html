@@ -682,7 +682,7 @@
         </div>
       `).join('') + `
         <div class="actions">
-          <button class="save-btn" id="saveBtn">💾 Save</button>
+          <button class="save-btn" id="saveBtn"></button>
         </div>
       `;
       // Hydrate textarea values + wire input listeners
@@ -698,6 +698,12 @@
     }
 
     function downloadEntry() {
+      const saveBtnEl = document.getElementById('saveBtn');
+
+      // Show save animation
+      saveBtnEl.style.backgroundImage = 'url("save-dynamic.png")';
+
+      // Prepare download
       const dateStr = new Date().toLocaleDateString(undefined, {
         weekday:'long', year:'numeric', month:'long', day:'numeric',
       });
@@ -716,6 +722,11 @@
       a.download = `island-journal-${dayKey}.txt`;
       a.click();
       URL.revokeObjectURL(url);
+
+      // Restore static image after animation
+      setTimeout(() => {
+        saveBtnEl.style.backgroundImage = 'url("save-static.png")';
+      }, 1000);
     }
 
     /* ================= Init: load saved entry ================= */
