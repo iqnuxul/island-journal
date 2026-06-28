@@ -271,14 +271,11 @@
       padding-top: 8px;
     }
     .save-btn {
+      position: relative;
       width: 200px;
       height: 200px;
       padding: 0;
-      background-image: url("save-static.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-color: transparent;
+      background: transparent;
       border: none;
       cursor: pointer;
       box-shadow: none;
@@ -286,6 +283,14 @@
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       user-select: none;
+    }
+    .save-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
     }
     .save-btn:hover { transform: scale(1.05); }
     .save-btn:active { transform: scale(0.95); }
@@ -596,6 +601,14 @@
       .then(b => { cachedDynamicBlob = b; })
       .catch(() => {});
 
+    /* Same blob-preload trick for the Save button APNG — CSS background-image
+       does NOT replay APNG on iOS Safari, so we swap a fresh <img> ObjectURL. */
+    let cachedSaveBlob = null;
+    fetch('save-dynamic.png')
+      .then(r => r.ok ? r.blob() : null)
+      .then(b => { cachedSaveBlob = b; })
+      .catch(() => {});
+
     /* ================= APNG replay logic =================
        The reliable way to restart an APNG: brand-new <img> element + a unique
        URL. We use an ObjectURL from the cached Blob (unique per call, zero
@@ -712,7 +725,7 @@
         </div>
       `).join('') + `
         <div class="actions">
-          <button class="save-btn" id="saveBtn"></button>
+          <button class="save-btn" id="saveBtn"><img id="saveImg" src="save-static.png" alt="Save" draggable="false" /></button>
         </div>
       `;
       // Hydrate textarea values + wire input listeners
@@ -738,19 +751,22 @@
       document.getElementById('saveBtn').addEventListener('click', downloadEntry);
     }
 
+    let saveObjectUrl = null;
     function downloadEntry() {
       const saveBtnEl = document.getElementById('saveBtn');
+      const saveImgEl = document.getElementById('saveImg');
       saveBtnEl.disabled = true;
 
-      // Show save animation with dynamic image
-      const timestamp = Date.now();
-      saveBtnEl.style.backgroundImage = 'url("save-dynamic.png?t=' + timestamp + '")';
-      saveBtnEl.style.backgroundSize = 'contain';
-      saveBtnEl.style.backgroundRepeat = 'no-repeat';
-      saveBtnEl.style.backgroundPosition = 'center';
-
-      // Force browser repaint
-      void saveBtnEl.offsetWidth;
+      // Swap to a freshly-decoded APNG <img> — same trick as the slot machine.
+      // A unique ObjectURL forces the browser to play from frame 1, which is the
+      // only reliable way to replay APNG on iOS Safari / mobile browsers.
+      if (saveObjectUrl) URL.revokeObjectURL(saveObjectUrl);
+      if (cachedSaveBlob) {
+        saveObjectUrl = URL.createObjectURL(cachedSaveBlob);
+        saveImgEl.src = saveObjectUrl;
+      } else {
+        saveImgEl.src = 'save-dynamic.png?t=' + Date.now();
+      }
 
       // Prepare download with slight delay to ensure animation starts
       setTimeout(() => {
@@ -776,7 +792,8 @@
 
       // Restore static image after animation
       setTimeout(() => {
-        saveBtnEl.style.backgroundImage = 'url("save-static.png")';
+        saveImgEl.src = 'save-static.png';
+        if (saveObjectUrl) { URL.revokeObjectURL(saveObjectUrl); saveObjectUrl = null; }
         saveBtnEl.disabled = false;
       }, 2000);
     }
