@@ -208,12 +208,14 @@
     .answer-input {
       position: relative;
       width: 100%;
-      min-height: 176px;
+      height: 100%;
+      aspect-ratio: 1 / 1;
+      min-height: 400px;
       padding: 6px 5px 0;
       background: transparent;
       border: none;
       outline: none;
-      resize: vertical;
+      resize: none;
       font-family: 'Schoolbell', cursive;
       font-size: 24px;
       font-weight: 400;
@@ -285,8 +287,8 @@
     <!-- Labels below the machine removed per user request -->
 
     <!-- Answer area + Save -->
-    <div class="answers" id="answersArea" hidden></div>
-    <div class="empty-state" id="emptyState">pull the lever to begin ✨</div>
+    <div class="answers" id="answersArea"></div>
+    <div class="empty-state" id="emptyState" hidden>pull the lever to begin ✨</div>
   </main>
 
   <script>
@@ -654,12 +656,11 @@
 
     function renderAnswers() {
       if (!prompts) {
-        answersArea.hidden = true;
         emptyState.hidden = false;
+        answersArea.innerHTML = '';
         return;
       }
       emptyState.hidden = true;
-      answersArea.hidden = false;
       answersArea.innerHTML = prompts.map((p, i) => `
         <div class="answer-block">
           <div class="answer-prompt">
