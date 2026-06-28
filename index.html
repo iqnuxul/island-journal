@@ -38,13 +38,16 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* =============== CLEAN PAPER BACKGROUND =============== */
+    /* =============== WATERCOLOR PAPER BACKGROUND =============== */
     body {
       background-color: var(--paper);
       background-image:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-      background-size: 320px 320px;
-      background-blend-mode: multiply;
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.32 0 0 0 0 0.2 0 0 0 0.08 0'/></filter><rect width='100%25' height='100%25' filter='url(%23m)'/></svg>"),
+        radial-gradient(ellipse at 50% 0%, #fffaf0 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, #f0e6d2 0%, transparent 65%);
+      background-size: 320px 320px, 1200px 1200px, auto, auto;
+      background-blend-mode: multiply, multiply, normal, multiply;
     }
 
     .page {
@@ -186,22 +189,7 @@
       flex-direction: column;
       gap: 32px;
     }
-    .answer-block {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 20px 22px;
-      border-radius: 6px;
-      background-color: #f7eecf;
-      background-image:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='an'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.25 0 0 0 0 0.12 0 0 0 0.14 0'/></filter><rect width='100%25' height='100%25' filter='url(%23an)'/></svg>"),
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'><filter id='am'><feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.32 0 0 0 0 0.2 0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23am)'/></svg>"),
-        radial-gradient(ellipse at 50% 0%, #fffaf0 0%, transparent 70%),
-        radial-gradient(ellipse at 50% 100%, #ecdcb4 0%, transparent 75%);
-      background-size: 320px 320px, 1200px 1200px, auto, auto;
-      background-blend-mode: multiply, multiply, normal, multiply;
-      box-shadow: 0 2px 10px rgba(106, 81, 58, 0.12);
-    }
+    .answer-block { display: flex; flex-direction: column; gap: 6px; }
     .answer-prompt {
       font-family: 'Schoolbell', cursive;
       font-size: 18px;
