@@ -198,7 +198,7 @@
 
     .answer-pad {
       position: relative;
-      padding: calc(3% + 5px);
+      padding: calc(3% + 5px) calc(10% + 15px);
     }
     .answer-pad::before {
       content: '';
@@ -717,9 +717,13 @@
 
     function downloadEntry() {
       const saveBtnEl = document.getElementById('saveBtn');
+      saveBtnEl.disabled = true;
 
-      // Show save animation
+      // Show save animation with dynamic image
       saveBtnEl.style.backgroundImage = 'url("save-dynamic.png")';
+      saveBtnEl.style.backgroundSize = 'contain';
+      saveBtnEl.style.backgroundRepeat = 'no-repeat';
+      saveBtnEl.style.backgroundPosition = 'center';
 
       // Prepare download
       const dateStr = new Date().toLocaleDateString(undefined, {
@@ -741,10 +745,11 @@
       a.click();
       URL.revokeObjectURL(url);
 
-      // Restore static image after animation
+      // Restore static image after longer animation
       setTimeout(() => {
         saveBtnEl.style.backgroundImage = 'url("save-static.png")';
-      }, 1000);
+        saveBtnEl.disabled = false;
+      }, 2000);
     }
 
     /* ================= Init: load saved entry ================= */
