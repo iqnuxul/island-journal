@@ -13,6 +13,13 @@
   <link rel="preload" as="image" href="slot-machine-original-dynamic.png" />
 
   <style>
+    /* Load custom font */
+    @font-face {
+      font-family: 'Mydogfont';
+      src: url('Mydogfont-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
     :root {
       --paper: #fcfaf2;
       --ink: #2a1d10;
@@ -26,8 +33,8 @@
     html, body {
       min-height: 100vh;
       color: var(--ink);
-      font-family: 'Nunito', 'Noto Sans SC', -apple-system, 'PingFang SC', sans-serif;
-      font-weight: 500;
+      font-family: 'Schoolbell', cursive;
+      font-weight: 400;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -85,7 +92,7 @@
       place-items: center;
       padding: clamp(2px, 1.2cqi, 8px);
       text-align: center;
-      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+      font-family: 'Schoolbell', cursive;
       font-size: clamp(10.5px, 2.4cqi, 17px);
       font-weight: 600;
       line-height: 1.35;
@@ -93,12 +100,10 @@
       pointer-events: none;
       word-break: break-word;
     }
-    /* Tuned to the NEW (larger) cylinder image's two screens — measured
-       directly off the user's red-box annotations. Screens are in the
-       LOWER half of the cabinet (cabinet is 1:1 but cylinder body sits
-       lower in this revised PNG). */
-    .reel-text-left  { left: 8%;  width: 27%; top: 48%; height: 34%; }
-    .reel-text-right { left: 39%; width: 27%; top: 48%; height: 34%; }
+    /* Tuned to match user's red-box annotations — screens centered
+       in the visible area of the cylinder. */
+    .reel-text-left  { left: 11%; width: 24%; top: 32%; height: 32%; }
+    .reel-text-right { left: 47%; width: 24%; top: 32%; height: 32%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
@@ -128,12 +133,12 @@
     /* =============== DATE DISPLAY =============== */
     .cabinet-date {
       text-align: center;
-      font-family: 'Schoolbell', cursive;
-      font-size: clamp(18px, 4cqi, 32px);
+      font-family: 'Mydogfont', cursive;
+      font-size: clamp(24px, 5cqi, 40px);
       font-weight: 400;
       color: var(--ink);
       margin-bottom: -8px;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
     }
 
     /* =============== REEL LABELS UNDER MACHINE =============== */
@@ -163,7 +168,7 @@
     }
     .answer-block { display: flex; flex-direction: column; gap: 6px; }
     .answer-prompt {
-      font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+      font-family: 'Schoolbell', cursive;
       font-size: 15px;
       font-weight: 700;
       color: var(--ink);
