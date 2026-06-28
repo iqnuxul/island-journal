@@ -60,6 +60,7 @@
       max-width: 680px;
       margin: 0 auto;
       aspect-ratio: 1 / 1;
+      container-type: inline-size;
     }
     .cabinet-img {
       position: absolute;
@@ -73,31 +74,29 @@
     .cabinet-img.is-hidden { visibility: hidden; }
     .cabinet-img-dynamic { z-index: 2; }
 
-    /* Reel text overlays — sit right inside the cylinder's two screens.
-       display:grid + place-items:center reliably centers multi-line text
-       (display:flex + align-items:center can mis-center wrapping text). */
+    /* Reel text overlays — sit inside the cylinder's two screens.
+       Font + padding scale with the cabinet (cqi = % of container width),
+       so the whole composition shrinks together on mobile. No line-clamp /
+       no overflow:hidden — long questions render in full. */
     .reel-text {
       position: absolute;
       z-index: 1;
       display: grid;
       place-items: center;
-      padding: 6px 4px;
+      padding: clamp(2px, 1.2cqi, 8px);
       text-align: center;
       font-family: 'Nunito', 'Noto Sans SC', sans-serif;
-      font-size: 13px;
+      font-size: clamp(10.5px, 2.4cqi, 17px);
       font-weight: 600;
-      line-height: 1.45;
+      line-height: 1.35;
       color: #1f1206;
       pointer-events: none;
       word-break: break-word;
-      overflow: hidden;
     }
-    /* Tuned to the two inner "screens" of the cylinder (the red-boxed area).
-       The cylinder body sits in the upper half of the square cabinet (~18-58%
-       of cabinet height), so screen text needs top in the high-20s, not the
-       40s, to land inside the panels rather than below them. */
-    .reel-text-left  { left: 17%; width: 19%; top: 28%; height: 22%; }
-    .reel-text-right { left: 41%; width: 19%; top: 28%; height: 22%; }
+    /* Tuned to the NEW (larger) cylinder image — slot machine now fills
+       most of the canvas, screens are bigger and sit lower. */
+    .reel-text-left  { left: 10%; width: 32%; top: 38%; height: 44%; }
+    .reel-text-right { left: 46%; width: 26%; top: 38%; height: 44%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
