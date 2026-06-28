@@ -140,9 +140,27 @@
       margin-bottom: -28px;
       margin-top: 4px;
       letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
-    .cabinet-date::before { content: '。 '; }
-    .cabinet-date::after { content: ' 。'; }
+    .cabinet-date::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><defs><filter id='dot'><feTurbulence type='fractalNoise' baseFrequency='0.1' numOctaves='2' result='noise' seed='1'/><feDisplacementMap in='SourceGraphic' in2='noise' scale='2' xChannelSelector='R' yChannelSelector='G'/></filter></defs><circle cx='12' cy='12' r='8' fill='%232a1d10' filter='url(%23dot)'/></svg>");
+      background-size: contain;
+      flex-shrink: 0;
+    }
+    .cabinet-date::after {
+      content: '';
+      width: 12px;
+      height: 12px;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><defs><filter id='dot'><feTurbulence type='fractalNoise' baseFrequency='0.1' numOctaves='2' result='noise' seed='1'/><feDisplacementMap in='SourceGraphic' in2='noise' scale='2' xChannelSelector='R' yChannelSelector='G'/></filter></defs><circle cx='12' cy='12' r='8' fill='%232a1d10' filter='url(%23dot)'/></svg>");
+      background-size: contain;
+      flex-shrink: 0;
+    }
 
     /* =============== REEL LABELS UNDER MACHINE =============== */
     .reel-labels {
