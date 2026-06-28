@@ -100,10 +100,10 @@
       pointer-events: none;
       word-break: break-word;
     }
-    /* Tuned to match user's red-box annotations — screens centered
-       in the visible area of the cylinder. */
-    .reel-text-left  { left: 11%; width: 24%; top: 32%; height: 32%; }
-    .reel-text-right { left: 47%; width: 24%; top: 32%; height: 32%; }
+    /* Tuned to match user's red-box annotations — screens positioned
+       lower in the visible area of the cylinder. */
+    .reel-text-left  { left: 11%; width: 24%; top: 40%; height: 32%; }
+    .reel-text-right { left: 47%; width: 24%; top: 40%; height: 32%; }
     .reel-text.spinning { animation: reel-shake 0.09s linear infinite; }
     @keyframes reel-shake {
       0%, 100% { transform: translateY(0); }
@@ -137,7 +137,8 @@
       font-size: clamp(24px, 5cqi, 40px);
       font-weight: 400;
       color: var(--ink);
-      margin-bottom: -8px;
+      margin-bottom: -28px;
+      margin-top: 4px;
       letter-spacing: 2px;
     }
 
@@ -280,11 +281,7 @@
       <button class="crank-hit" id="crankBtn" aria-label="拉摇杆"></button>
     </div>
 
-    <!-- Labels below the machine in handwriting -->
-    <div class="reel-labels">
-      <span class="reel-label-left">✦ reflect</span>
-      <span class="reel-label-right">check in ✦</span>
-    </div>
+    <!-- Labels below the machine removed per user request -->
 
     <!-- Answer area + Save -->
     <div class="answers" id="answersArea" hidden></div>
@@ -652,7 +649,7 @@
             <span>${escapeHtml(p)}</span>
           </div>
           <div class="answer-pad">
-            <textarea class="answer-input" data-idx="${i}" placeholder="here…"></textarea>
+            <textarea class="answer-input" data-idx="${i}"></textarea>
           </div>
         </div>
       `).join('') + `
