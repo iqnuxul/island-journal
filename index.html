@@ -740,34 +740,39 @@
       const saveBtnEl = document.getElementById('saveBtn');
       saveBtnEl.disabled = true;
 
-      // Show save animation with dynamic image (add timestamp to force reload)
+      // Show save animation with dynamic image
       const timestamp = Date.now();
       saveBtnEl.style.backgroundImage = 'url("save-dynamic.png?t=' + timestamp + '")';
       saveBtnEl.style.backgroundSize = 'contain';
       saveBtnEl.style.backgroundRepeat = 'no-repeat';
       saveBtnEl.style.backgroundPosition = 'center';
 
-      // Prepare download
-      const dateStr = new Date().toLocaleDateString(undefined, {
-        weekday:'long', year:'numeric', month:'long', day:'numeric',
-      });
-      let body = `小岛日记 · Island Journal — ${dateStr}\n\n`;
-      if (prompts) {
-        prompts.forEach((p, i) => {
-          body += `${i+1}. ${p}\n${answers[i] || '(empty)'}\n\n`;
-        });
-      } else {
-        body += '(还没抽签 — 先拉一下摇杆)\n';
-      }
-      const blob = new Blob([body], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `island-journal-${dayKey}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
+      // Force browser repaint
+      void saveBtnEl.offsetWidth;
 
-      // Restore static image after longer animation
+      // Prepare download with slight delay to ensure animation starts
+      setTimeout(() => {
+        const dateStr = new Date().toLocaleDateString(undefined, {
+          weekday:'long', year:'numeric', month:'long', day:'numeric',
+        });
+        let body = `小岛日记 · Island Journal — ${dateStr}\n\n`;
+        if (prompts) {
+          prompts.forEach((p, i) => {
+            body += `${i+1}. ${p}\n${answers[i] || '(empty)'}\n\n`;
+          });
+        } else {
+          body += '(还没抽签 — 先拉一下摇杆)\n';
+        }
+        const blob = new Blob([body], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `island-journal-${dayKey}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }, 100);
+
+      // Restore static image after animation
       setTimeout(() => {
         saveBtnEl.style.backgroundImage = 'url("save-static.png")';
         saveBtnEl.disabled = false;
