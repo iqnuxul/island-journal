@@ -63,8 +63,8 @@
     .back-link {
       display: inline-block;
       margin-bottom: 18px;
-      font-family: 'Caveat', cursive;
-      font-size: 20px;
+      font-family: 'Schoolbell', cursive;
+      font-size: 19px;
       color: var(--ink-soft);
       text-decoration: none;
     }
@@ -135,17 +135,44 @@
     .msg.err { color: var(--red); }
     .msg.ok  { color: var(--check); }
 
-    /* avatar picker */
-    .avatar-pick { display: flex; align-items: center; gap: 14px; }
-    .avatar-preview {
-      width: 64px; height: 64px;
+    /* ===== Profile: compose / collapsed ===== */
+    .avatar-center { display: flex; justify-content: center; }
+    .avatar-circle {
+      width: 96px; height: 96px;
       border-radius: 50%;
-      object-fit: cover;
       border: 2px solid var(--ink);
-      background: #efe6d2;
-      flex-shrink: 0;
+      background: #efe6d2 center / cover no-repeat;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0; overflow: hidden;
+      color: var(--ink-soft); font-size: 34px; line-height: 1;
+      -webkit-tap-highlight-color: transparent;
     }
-    .avatar-preview.empty { display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--ink-soft); }
+    .avatar-circle:hover { border-color: var(--reflect); }
+    .pencil-btn {
+      display: block; margin: 8px auto 0;
+      background: none; border: none; cursor: pointer;
+      font-size: 22px; color: var(--ink-soft);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pencil-btn:hover { color: var(--ink); transform: rotate(-8deg); }
+    .nick-line {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: min(280px, 80%); margin: 14px auto 18px;
+      border-bottom: 1.6px solid var(--line); padding-bottom: 5px;
+    }
+    .nick-line input {
+      flex: 1 1 auto; width: auto; min-width: 0;
+      border: none; background: transparent; text-align: center;
+      font-family: 'Schoolbell', cursive; font-size: 20px; color: var(--ink);
+      padding: 2px 0; outline: none;
+    }
+    .nick-pencil { color: var(--ink-soft); font-size: 15px; flex-shrink: 0; }
+    #composeView textarea {
+      display: block; width: 100%; max-width: 440px; margin: 0 auto 18px;
+      min-height: 96px;
+    }
+    .post-row { display: flex; justify-content: center; }
+    #composeView .msg, #collapsedView .msg { text-align: center; }
     input[type=file] { display: none; }
 
     .step { display: none; }
@@ -191,16 +218,15 @@
 </head>
 <body>
   <main class="page">
-    <a class="back-link" href="/">← back to the journal</a>
+    <a class="back-link" href="/">← back</a>
 
     <div class="head">
-      <h1>Reviews</h1>
+      <h1>who is here</h1>
       <p>leave a little note ✎</p>
     </div>
 
     <!-- ===== Leave a review ===== -->
     <section class="card" id="formCard">
-      <h2>Leave your mark</h2>
 
       <!-- Step 1: email -->
       <div class="step active" id="stepEmail">
@@ -228,29 +254,27 @@
         <div class="msg" id="codeMsg"></div>
       </div>
 
-      <!-- Step 3: profile + message -->
+      <!-- Step 3: compose / collapsed -->
       <div class="step" id="stepProfile">
-        <div class="field">
-          <label>Profile picture</label>
-          <div class="avatar-pick">
-            <img class="avatar-preview empty" id="avatarPreview" alt="" />
-            <span class="avatar-preview empty" id="avatarPlaceholder">☺</span>
-            <button class="btn ghost" id="pickAvatarBtn" type="button">upload photo</button>
-            <input type="file" id="avatarInput" accept="image/*" />
+        <!-- Collapsed: just avatar + pencil (returning user who already posted) -->
+        <div id="collapsedView" hidden>
+          <div class="avatar-center"><div class="avatar-circle" id="collapsedAvatar"></div></div>
+          <button class="pencil-btn" id="expandBtn" type="button" aria-label="write another">✎</button>
+        </div>
+        <!-- Compose -->
+        <div id="composeView">
+          <div class="avatar-center">
+            <button class="avatar-circle" id="avatarBtn" type="button" aria-label="upload photo">+</button>
           </div>
+          <input type="file" id="avatarInput" accept="image/*" />
+          <div class="nick-line">
+            <input type="text" id="nickname" maxlength="40" placeholder="nickname" />
+            <span class="nick-pencil">✎</span>
+          </div>
+          <textarea id="message" maxlength="1000" placeholder="write a comment…"></textarea>
+          <div class="post-row"><button class="btn" id="submitBtn">post</button></div>
+          <div class="msg" id="profileMsg"></div>
         </div>
-        <div class="field">
-          <label for="nickname">Nickname</label>
-          <input type="text" id="nickname" maxlength="40" placeholder="what should we call you?" />
-        </div>
-        <div class="field">
-          <label for="message">Your review</label>
-          <textarea id="message" maxlength="1000" placeholder="say something nice (or honest) ♡"></textarea>
-        </div>
-        <div class="row">
-          <button class="btn" id="submitBtn">Post review</button>
-        </div>
-        <div class="msg" id="profileMsg"></div>
       </div>
     </section>
 
@@ -311,42 +335,74 @@
       btn.disabled = false;
       if (error) { setMsg($('codeMsg'), error.message, 'err'); return; }
       setMsg($('codeMsg'), '');
-      enterProfileStep();
+      afterVerified();
     });
 
-    /* ================= Profile + submit ================= */
-    function enterProfileStep() {
+    /* ================= Profile: compose / collapsed ================= */
+    let currentUser = null;
+    let myLastReview = null;   // this user's most recent review (for prefill + collapsed avatar)
+
+    function setAvatarCircle(el, url) {
+      if (url) { el.style.backgroundImage = `url("${url}")`; el.textContent = ''; }
+      else { el.style.backgroundImage = ''; el.textContent = (el.id === 'collapsedAvatar') ? '☺' : '+'; }
+    }
+
+    async function afterVerified() {
       showStep('profile');
+      const { data: { user } } = await sb.auth.getUser();
+      currentUser = user;
+      if (!user) { enterCompose(null); return; }
+      // Has this user posted before? → collapsed; otherwise show the compose form.
+      const { data } = await sb.from('reviews').select('*').eq('user_id', user.id)
+        .order('created_at', { ascending: false }).limit(1);
+      myLastReview = (data && data.length) ? data[0] : null;
+      if (myLastReview) enterCollapsed(); else enterCompose(null);
+    }
+
+    function enterCollapsed() {
+      $('composeView').hidden = true;
+      $('collapsedView').hidden = false;
+      setAvatarCircle($('collapsedAvatar'), myLastReview ? myLastReview.avatar_url : null);
+    }
+
+    function enterCompose(prefill) {
+      $('collapsedView').hidden = true;
+      $('composeView').hidden = false;
+      avatarFile = null;
+      const existing = (prefill && prefill.avatar_url) ? prefill.avatar_url : '';
+      $('avatarBtn').dataset.existing = existing;
+      setAvatarCircle($('avatarBtn'), existing || null);
+      $('nickname').value = (prefill && prefill.nickname) ? prefill.nickname : '';
+      $('message').value = '';
+      setMsg($('profileMsg'), '');
       $('nickname').focus();
     }
 
-    $('pickAvatarBtn').addEventListener('click', () => $('avatarInput').click());
+    $('expandBtn').addEventListener('click', () => enterCompose(myLastReview));
+
+    $('avatarBtn').addEventListener('click', () => $('avatarInput').click());
     $('avatarInput').addEventListener('change', (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) { setMsg($('profileMsg'), 'Image too large (max 5MB).', 'err'); return; }
       avatarFile = file;
-      const url = URL.createObjectURL(file);
-      const img = $('avatarPreview');
-      img.src = url;
-      img.classList.remove('empty');
-      $('avatarPlaceholder').style.display = 'none';
+      $('avatarBtn').dataset.existing = '';   // a new upload overrides any reused avatar
+      setAvatarCircle($('avatarBtn'), URL.createObjectURL(file));
       setMsg($('profileMsg'), '');
     });
 
     $('submitBtn').addEventListener('click', async () => {
       const nickname = $('nickname').value.trim();
       const message = $('message').value.trim();
-      if (!nickname) { setMsg($('profileMsg'), 'Please add a nickname.', 'err'); return; }
-      if (!message) { setMsg($('profileMsg'), 'Please write something.', 'err'); return; }
+      if (!nickname) { setMsg($('profileMsg'), 'Add a nickname.', 'err'); return; }
+      if (!message) { setMsg($('profileMsg'), 'Write a comment.', 'err'); return; }
       const btn = $('submitBtn'); btn.disabled = true;
       setMsg($('profileMsg'), 'Posting…');
-
       try {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) throw new Error('Session expired — please verify again.');
 
-        let avatar_url = null;
+        let avatar_url = $('avatarBtn').dataset.existing || null;  // reuse prior avatar if not re-picked
         if (avatarFile) {
           const ext = (avatarFile.name.split('.').pop() || 'jpg').toLowerCase();
           const path = `${user.id}/${Date.now()}.${ext}`;
@@ -358,13 +414,9 @@
         const ins = await sb.from('reviews').insert({ user_id: user.id, nickname, message, avatar_url }).select().single();
         if (ins.error) throw ins.error;
 
-        setMsg($('profileMsg'), 'Thank you! ♡', 'ok');
         prependReview(ins.data);
-        // reset form
-        $('nickname').value = ''; $('message').value = '';
-        avatarFile = null;
-        $('avatarPreview').src = ''; $('avatarPreview').classList.add('empty');
-        $('avatarPlaceholder').style.display = '';
+        myLastReview = ins.data;
+        enterCollapsed();   // back to collapsed — same user can post several comments
       } catch (err) {
         setMsg($('profileMsg'), err.message || 'Something went wrong.', 'err');
       } finally {
@@ -410,10 +462,10 @@
     /* ================= Init ================= */
     (async function init() {
       loadReviews();
-      // If already signed in (returning verified user), skip straight to the profile step.
+      // If already signed in (returning verified user), skip straight past email/code.
       if (CONFIGURED) {
         const { data: { session } } = await sb.auth.getSession();
-        if (session && session.user) enterProfileStep();
+        if (session && session.user) afterVerified();
       }
     })();
   </script>
