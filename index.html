@@ -667,11 +667,17 @@
     const emptyState  = document.getElementById('emptyState');
     const cabDateEl   = document.getElementById('cabDate');
 
+    // Mydogfont has no glyph for the digit 0, so swap 0 → lowercase 'o' anywhere
+    // it's rendered in that font (the date). Plain-text export keeps real digits.
+    const zeroToO = (s) => s.replace(/0/g, 'o');
+    let dateLabel = '';  // real-digit date (e.g., "June 30") for txt export
+
     // Set date above cabinet (e.g., "July 17")
     (() => {
       const d = new Date();
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      cabDateEl.textContent = `${months[d.getMonth()]} ${d.getDate()}`;
+      dateLabel = `${months[d.getMonth()]} ${d.getDate()}`;
+      cabDateEl.textContent = zeroToO(dateLabel);  // on-page (Mydogfont) → o-swap
     })();
 
     /* ================= State ================= */
@@ -928,7 +934,7 @@
 
     /* ---- TXT export: date, questions, answers only (no Chinese / branding) ---- */
     function saveAsTxt() {
-      let body = `${cabDateEl.textContent}, ${new Date().getFullYear()}\n\n`;
+      let body = `${dateLabel}, ${new Date().getFullYear()}\n\n`;
       prompts.forEach((p, i) => {
         body += `${i + 1}. ${p}\n${answers[i] || ''}\n\n`;
       });
