@@ -911,7 +911,7 @@
 
     /* ---- TXT export: date, questions, answers only (no Chinese / branding) ---- */
     function saveAsTxt() {
-      let body = `${cabDateEl.textContent}\n\n`;
+      let body = `${cabDateEl.textContent}, ${new Date().getFullYear()}\n\n`;
       prompts.forEach((p, i) => {
         body += `${i + 1}. ${p}\n${answers[i] || ''}\n\n`;
       });
@@ -967,8 +967,9 @@
         const qLines = wrapLines(ctx, p, contentW - numW);
         blocks.push({ kind: 'q', numText, numFont, numW, lines: qLines, font: '700 40px Schoolbell', lh: 56, after: 14 });
         ctx.font = '400 36px Schoolbell';
-        const aLines = wrapLines(ctx, (answers[i] || '').trim(), contentW);
-        blocks.push({ kind: 'a', lines: aLines, font: '400 36px Schoolbell', lh: 50, after: i === 0 ? 30 : 46 });
+        const aInset = 44; // extra horizontal breathing room for answers
+        const aLines = wrapLines(ctx, (answers[i] || '').trim(), contentW - aInset * 2);
+        blocks.push({ kind: 'a', lines: aLines, inset: aInset, font: '400 36px Schoolbell', lh: 50, after: i === 0 ? 30 : 46 });
         if (i === 0) blocks.push({ kind: 'divider', before: 6, after: 36 });
       });
       blocks.push({ kind: 'logo', before: 36, after: 0 });
@@ -1011,7 +1012,8 @@
           y += b.lines.length * b.lh;
         } else { // answer
           ctx.textAlign = 'left'; ctx.font = b.font; ctx.fillStyle = INK_SOFT;
-          b.lines.forEach((ln, idx) => ctx.fillText(ln, pad, y + b.lh * 0.72 + idx * b.lh));
+          const ax = pad + (b.inset || 0);
+          b.lines.forEach((ln, idx) => ctx.fillText(ln, ax, y + b.lh * 0.72 + idx * b.lh));
           y += b.lines.length * b.lh;
         }
         if (b.after) y += b.after;
