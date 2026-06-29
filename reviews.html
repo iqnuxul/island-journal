@@ -218,8 +218,8 @@
       <!-- Step 2: code -->
       <div class="step" id="stepCode">
         <div class="field">
-          <label for="code">Enter the 6-digit code we emailed to <span id="codeEmailLabel"></span></label>
-          <input type="tel" id="code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code" />
+          <label for="code">Enter the code we emailed to <span id="codeEmailLabel"></span></label>
+          <input type="tel" id="code" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="one-time-code" />
         </div>
         <div class="row">
           <button class="btn" id="verifyBtn">Verify</button>
@@ -304,7 +304,7 @@
 
     $('verifyBtn').addEventListener('click', async () => {
       const token = $('code').value.trim();
-      if (!/^\d{6}$/.test(token)) { setMsg($('codeMsg'), 'Enter the 6-digit code.', 'err'); return; }
+      if (!/^\d{6,8}$/.test(token)) { setMsg($('codeMsg'), 'Enter the code we emailed you.', 'err'); return; }
       const btn = $('verifyBtn'); btn.disabled = true;
       setMsg($('codeMsg'), 'Verifying…');
       const { data, error } = await sb.auth.verifyOtp({ email: pendingEmail, token, type: 'email' });
