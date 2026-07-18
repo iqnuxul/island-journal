@@ -134,13 +134,13 @@
       50% { transform: translateY(-2px); }
     }
 
-    /* Invisible click area over the lever */
+    /* Invisible click area over the lever — generous catch zone around the paw */
     .crank-hit {
       position: absolute;
-      left: 60%;
+      left: 52%;
       top: 0%;
-      width: 35%;
-      height: 45%;
+      width: 46%;
+      height: 56%;
       background: transparent !important;
       border: none;
       padding: 0;
@@ -878,40 +878,49 @@
         pulling = false;
       }
     }
-    /* ===== Pull gesture: press the lever, then drag DOWN to trigger ===== */
-    const PULL_THRESHOLD = 20;   // px of downward drag needed to fire
-    let pullStartY = null;
-    let pullMaxY = null;         // furthest-down point seen during this touch
-    let pullFired = false;
+    /* ===== Pull gesture: press the lever, then drag DOWN to trigger =====
+       Touch (mobile) and mouse (desktop) are handled separately. On touch we
+       preventDefault the downward move so the browser can't steal the gesture as
+       a page scroll — that scroll-stealing was why it "mostly didn't work". */
+    const PULL_THRESHOLD = 18;   // px of downward drag needed to fire
 
-    // Fire if the drag went down far enough. Checked on every move AND on release,
-    // because mobile browsers coalesce/drop move events on a fast flick — the final
-    // (up) position is often the only reliable sample.
-    function tryFirePull(clientY) {
-      if (pullStartY === null || pullFired) return;
-      if (clientY != null) pullMaxY = Math.max(pullMaxY ?? clientY, clientY);
-      if ((pullMaxY - pullStartY) >= PULL_THRESHOLD) {
-        pullFired = true;
-        handlePull();
+    // -- touch (mobile) --
+    let tStartY = null, tMax = 0, tFired = false;
+    crankBtn.addEventListener('touchstart', (e) => {
+      if (pulling) { tStartY = null; return; }
+      tStartY = e.touches[0].clientY; tMax = 0; tFired = false;
+      initAudio(); ensureDogBuffer();
+    }, { passive: true });
+    crankBtn.addEventListener('touchmove', (e) => {
+      if (tStartY === null || tFired) return;
+      const dy = e.touches[0].clientY - tStartY;
+      if (dy > 3) e.preventDefault();               // pulling down → block page scroll
+      if (dy > tMax) tMax = dy;
+      if (tMax >= PULL_THRESHOLD) { tFired = true; handlePull(); }
+    }, { passive: false });
+    crankBtn.addEventListener('touchend', (e) => {
+      if (tStartY !== null && !tFired && e.changedTouches && e.changedTouches[0]) {
+        if (e.changedTouches[0].clientY - tStartY >= PULL_THRESHOLD) { tFired = true; handlePull(); }
       }
-    }
+      tStartY = null;
+    });
+    crankBtn.addEventListener('touchcancel', () => { tStartY = null; });
 
-    crankBtn.addEventListener('pointerdown', (e) => {
+    // -- mouse (desktop) --
+    let mStartY = null, mFired = false;
+    crankBtn.addEventListener('mousedown', (e) => {
       if (pulling) return;
-      pullStartY = e.clientY;
-      pullMaxY = e.clientY;
-      pullFired = false;
-      initAudio();                                  // unlock audio on the press (mobile)
-      ensureDogBuffer();                            // start decoding the clip ASAP
-      try { crankBtn.setPointerCapture(e.pointerId); } catch (_) {}
+      mStartY = e.clientY; mFired = false;
+      initAudio(); ensureDogBuffer();
     });
-    crankBtn.addEventListener('pointermove', (e) => tryFirePull(e.clientY));
-    crankBtn.addEventListener('pointerup', (e) => {
-      tryFirePull(e.clientY);                       // last chance — catches fast flicks
-      pullStartY = null; pullMaxY = null;
-      try { crankBtn.releasePointerCapture(e.pointerId); } catch (_) {}
+    window.addEventListener('mousemove', (e) => {
+      if (mStartY === null || mFired) return;
+      if (e.clientY - mStartY >= PULL_THRESHOLD) { mFired = true; handlePull(); }
     });
-    crankBtn.addEventListener('pointercancel', () => { pullStartY = null; pullMaxY = null; });
+    window.addEventListener('mouseup', (e) => {
+      if (mStartY !== null && !mFired && e.clientY - mStartY >= PULL_THRESHOLD) { mFired = true; handlePull(); }
+      mStartY = null;
+    });
 
     /* ================= Answer rendering / save ================= */
     let saveTimer;
