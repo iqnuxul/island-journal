@@ -21,6 +21,15 @@
   <meta name="twitter:description" content="One pull, one question, one little chat with yourself." />
   <meta name="twitter:image" content="https://gacha-journal.vercel.app/cover.png" />
 
+  <!-- Home-screen / PWA icons (from cover.png) -->
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#fefdfb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Gacha" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Schoolbell&family=Caveat:wght@400;500;600;700&family=Long+Cang&family=Nunito:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -135,10 +144,12 @@
       background: transparent !important;
       border: none;
       padding: 0;
-      cursor: pointer;
+      cursor: grab;
       z-index: 3;
+      touch-action: none;   /* let us track a downward drag instead of scrolling */
       -webkit-tap-highlight-color: transparent;
     }
+    .crank-hit:active { cursor: grabbing; }
     .crank-hit:hover, .crank-hit:active, .crank-hit:focus {
       background: transparent !important;
       outline: none;
@@ -404,7 +415,7 @@
       <img
         class="cabinet-img cabinet-img-static"
         id="staticImg"
-        src="initial-page-slot-machine-static.png"
+        src="slot-machine-original-static.png"
         alt="slot machine"
         draggable="false"
       />
@@ -653,9 +664,76 @@
         osc.start(); osc.stop(audioCtx.currentTime + dur);
       } catch (e) {}
     };
-    const tick = () => tone(720, 0.025, 0.035, 'square');
+    // Short filtered-noise burst — the basis of a percussive "click/tap".
+    const noiseBurst = (dur = 0.03, vol = 0.14, freq = 2500, q = 1.1) => {
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const n = Math.max(1, Math.floor(audioCtx.sampleRate * dur));
+        const buf = audioCtx.createBuffer(1, n, audioCtx.sampleRate);
+        const ch = buf.getChannelData(0);
+        for (let i = 0; i < n; i++) ch[i] = Math.random() * 2 - 1;
+        const src = audioCtx.createBufferSource(); src.buffer = buf;
+        const filt = audioCtx.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = freq; filt.Q.value = q;
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(vol, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+        src.connect(filt).connect(g).connect(audioCtx.destination);
+        src.start(); src.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    };
+    // 狗爪踏地的"哒"—— 清脆的指甲 click（噪声）+ 软软的肉垫底音
+    const pawTap = () => {
+      noiseBurst(0.028, 0.14, 2300 + Math.random() * 700, 1.1);  // claw tick on the floor
+      tone(80 + Math.random() * 20, 0.045, 0.025, 'sine');       // soft paw-pad thump underneath
+    };
+    const tick = () => {};   // reel changes are SILENT — the dog-walk sound runs on its own clock
     const jingle = () => [523, 659, 784, 1047].forEach((f,i) => setTimeout(() => tone(f, 0.18, 0.05, 'sine'), i*90));
-    const leverSound = () => { tone(180, 0.2, 0.08, 'sawtooth'); setTimeout(() => tone(120, 0.15, 0.06, 'sawtooth'), 80); };
+
+    // Irregular paw-steps — a real dog doesn't walk on a metronome. We drive the
+    // taps on a random-interval clock (not the reel cadence), with occasional quick
+    // double-steps, so the rhythm feels natural instead of regularly slowing down.
+    let walkTimer = null;
+    const stopWalking = () => { if (walkTimer) { clearTimeout(walkTimer); walkTimer = null; } };
+    const startWalking = (durationMs) => {
+      stopWalking();
+      const end = performance.now() + durationMs;
+      const step = () => {
+        if (performance.now() >= end) { walkTimer = null; return; }
+        pawTap();
+        if (Math.random() < 0.3) setTimeout(pawTap, 45 + Math.random() * 45);  // sometimes a 2nd paw right after
+        walkTimer = setTimeout(step, 95 + Math.random() * 200);                 // uneven gaps
+      };
+      step();
+    };
+    /* ===== Real recording: play a RANDOM ~2.4s slice of dogwalk.mp3 each pull ===== */
+    let dogWalkArrayBuffer = null;   // raw bytes, fetched once
+    let dogWalkBuffer = null;        // decoded AudioBuffer
+    fetch('dogwalk.mp3').then(r => r.ok ? r.arrayBuffer() : null).then(b => { dogWalkArrayBuffer = b; }).catch(() => {});
+
+    const ensureDogBuffer = () => {
+      if (dogWalkBuffer || !dogWalkArrayBuffer || !audioCtx) return;
+      // decodeAudioData detaches the buffer, so decode a copy
+      audioCtx.decodeAudioData(dogWalkArrayBuffer.slice(0)).then(buf => { dogWalkBuffer = buf; }).catch(() => {});
+    };
+
+    const playDogWalk = (segLen = 2.4) => {
+      ensureDogBuffer();
+      if (!dogWalkBuffer || !audioCtx) { startWalking(2400); return; }  // fallback until decoded
+      const dur = dogWalkBuffer.duration;
+      const len = Math.min(segLen, dur);
+      const offset = Math.random() * Math.max(0, dur - len);   // random start point each time
+      const src = audioCtx.createBufferSource(); src.buffer = dogWalkBuffer;
+      const g = audioCtx.createGain();
+      const t = audioCtx.currentTime, vol = 0.9;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.04);            // fade in
+      g.gain.setValueAtTime(vol, t + len - 0.15);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + len);         // fade out
+      src.connect(g).connect(audioCtx.destination);
+      src.start(t, offset, len);
+    };
+    const leverSound = () => playDogWalk(2.4);
 
     /* ================= DOM refs ================= */
     const cabinetEl   = document.getElementById('cabinet');
@@ -781,21 +859,45 @@
       ]);
 
       // 3) Let the APNG settle, then swap back to static cylinder.
-      //    After the first pull, use the regular (non-initial) static frame.
       setTimeout(() => {
         removeDynamic();
-        staticImg.src = 'slot-machine-original-static.png';
         staticImg.classList.remove('is-hidden');
       }, 350);
 
       jingle();
 
       prompts = [deep, simple];
+      answers = ['', ''];        // every pull starts a fresh, empty answer area
       renderAnswers();
       saveEntry();
       pulling = false;
     }
-    crankBtn.addEventListener('click', handlePull);
+    /* ===== Pull gesture: press the lever, then drag DOWN to trigger ===== */
+    const PULL_THRESHOLD = 28;   // px of downward drag needed to fire
+    let pullStartY = null;
+    let pullFired = false;
+
+    crankBtn.addEventListener('pointerdown', (e) => {
+      if (pulling) return;
+      pullStartY = e.clientY;
+      pullFired = false;
+      initAudio();                                  // unlock audio on the press (mobile)
+      ensureDogBuffer();                            // start decoding the clip ASAP
+      try { crankBtn.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    crankBtn.addEventListener('pointermove', (e) => {
+      if (pullStartY === null || pullFired) return;
+      if (e.clientY - pullStartY >= PULL_THRESHOLD) {  // dragged down far enough
+        pullFired = true;
+        handlePull();
+      }
+    });
+    const endPull = (e) => {
+      pullStartY = null;
+      try { crankBtn.releasePointerCapture(e.pointerId); } catch (_) {}
+    };
+    crankBtn.addEventListener('pointerup', endPull);
+    crankBtn.addEventListener('pointercancel', endPull);
 
     /* ================= Answer rendering / save ================= */
     let saveTimer;
@@ -1077,8 +1179,6 @@
           prompts = obj.prompts;
           reel1El.textContent = obj.prompts[0];
           reel2El.textContent = obj.prompts[1];
-          // returning user already pulled today → show the regular static frame
-          staticImg.src = 'slot-machine-original-static.png';
         }
         if (Array.isArray(obj.answers)) {
           answers = obj.answers.slice(0, 2);
