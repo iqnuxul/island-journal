@@ -840,64 +840,78 @@
     async function handlePull() {
       if (pulling) return;
       pulling = true;
+      try {
+        // Initialize audio context early for mobile
+        await initAudio();
 
-      // Initialize audio context early for mobile
-      await initAudio();
+        // 1) Hide static, mount a freshly-decoded APNG
+        staticImg.classList.add('is-hidden');
+        mountFreshDynamic();
 
-      // 1) Hide static, mount a freshly-decoded APNG
-      staticImg.classList.add('is-hidden');
-      mountFreshDynamic();
+        leverSound();
 
-      leverSound();
+        // 2) Spin reels
+        const deep   = pickOne(DEEP_QUESTIONS);
+        const simple = pickOne(SIMPLE_QUESTIONS);
+        await Promise.all([
+          spinReel(reel1El, DEEP_QUESTIONS, deep, 1500),
+          spinReel(reel2El, SIMPLE_QUESTIONS, simple, 2200),
+        ]);
 
-      // 2) Spin reels
-      const deep   = pickOne(DEEP_QUESTIONS);
-      const simple = pickOne(SIMPLE_QUESTIONS);
-      await Promise.all([
-        spinReel(reel1El, DEEP_QUESTIONS, deep, 1500),
-        spinReel(reel2El, SIMPLE_QUESTIONS, simple, 2200),
-      ]);
+        // 3) Let the APNG settle, then swap back to static cylinder.
+        setTimeout(() => {
+          removeDynamic();
+          staticImg.classList.remove('is-hidden');
+        }, 350);
 
-      // 3) Let the APNG settle, then swap back to static cylinder.
-      setTimeout(() => {
+        jingle();
+
+        prompts = [deep, simple];
+        answers = ['', ''];        // every pull starts a fresh, empty answer area
+        renderAnswers();
+        saveEntry();
+      } catch (e) {
+        // never leave the lever stuck — restore the static frame on any failure
         removeDynamic();
         staticImg.classList.remove('is-hidden');
-      }, 350);
-
-      jingle();
-
-      prompts = [deep, simple];
-      answers = ['', ''];        // every pull starts a fresh, empty answer area
-      renderAnswers();
-      saveEntry();
-      pulling = false;
+      } finally {
+        pulling = false;
+      }
     }
     /* ===== Pull gesture: press the lever, then drag DOWN to trigger ===== */
-    const PULL_THRESHOLD = 28;   // px of downward drag needed to fire
+    const PULL_THRESHOLD = 20;   // px of downward drag needed to fire
     let pullStartY = null;
+    let pullMaxY = null;         // furthest-down point seen during this touch
     let pullFired = false;
+
+    // Fire if the drag went down far enough. Checked on every move AND on release,
+    // because mobile browsers coalesce/drop move events on a fast flick — the final
+    // (up) position is often the only reliable sample.
+    function tryFirePull(clientY) {
+      if (pullStartY === null || pullFired) return;
+      if (clientY != null) pullMaxY = Math.max(pullMaxY ?? clientY, clientY);
+      if ((pullMaxY - pullStartY) >= PULL_THRESHOLD) {
+        pullFired = true;
+        handlePull();
+      }
+    }
 
     crankBtn.addEventListener('pointerdown', (e) => {
       if (pulling) return;
       pullStartY = e.clientY;
+      pullMaxY = e.clientY;
       pullFired = false;
       initAudio();                                  // unlock audio on the press (mobile)
       ensureDogBuffer();                            // start decoding the clip ASAP
       try { crankBtn.setPointerCapture(e.pointerId); } catch (_) {}
     });
-    crankBtn.addEventListener('pointermove', (e) => {
-      if (pullStartY === null || pullFired) return;
-      if (e.clientY - pullStartY >= PULL_THRESHOLD) {  // dragged down far enough
-        pullFired = true;
-        handlePull();
-      }
-    });
-    const endPull = (e) => {
-      pullStartY = null;
+    crankBtn.addEventListener('pointermove', (e) => tryFirePull(e.clientY));
+    crankBtn.addEventListener('pointerup', (e) => {
+      tryFirePull(e.clientY);                       // last chance — catches fast flicks
+      pullStartY = null; pullMaxY = null;
       try { crankBtn.releasePointerCapture(e.pointerId); } catch (_) {}
-    };
-    crankBtn.addEventListener('pointerup', endPull);
-    crankBtn.addEventListener('pointercancel', endPull);
+    });
+    crankBtn.addEventListener('pointercancel', () => { pullStartY = null; pullMaxY = null; });
 
     /* ================= Answer rendering / save ================= */
     let saveTimer;
