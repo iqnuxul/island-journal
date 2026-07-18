@@ -884,7 +884,7 @@
        a page scroll — that scroll-stealing was why it "mostly didn't work". */
     const PULL_THRESHOLD = 18;   // px of downward drag needed to fire
 
-    // -- touch (mobile) --
+    // -- touch (mobile): a downward drag fires mid-pull; a plain tap fires on release --
     let tStartY = null, tMax = 0, tFired = false;
     crankBtn.addEventListener('touchstart', (e) => {
       if (pulling) { tStartY = null; return; }
@@ -893,20 +893,18 @@
     }, { passive: true });
     crankBtn.addEventListener('touchmove', (e) => {
       if (tStartY === null || tFired) return;
+      e.preventDefault();                              // always block scroll while on the lever
       const dy = e.touches[0].clientY - tStartY;
-      if (dy > 3) e.preventDefault();               // pulling down → block page scroll
       if (dy > tMax) tMax = dy;
-      if (tMax >= PULL_THRESHOLD) { tFired = true; handlePull(); }
+      if (tMax >= PULL_THRESHOLD) { tFired = true; handlePull(); }   // responsive: fires as you pull
     }, { passive: false });
-    crankBtn.addEventListener('touchend', (e) => {
-      if (tStartY !== null && !tFired && e.changedTouches && e.changedTouches[0]) {
-        if (e.changedTouches[0].clientY - tStartY >= PULL_THRESHOLD) { tFired = true; handlePull(); }
-      }
+    crankBtn.addEventListener('touchend', () => {
+      if (tStartY !== null && !tFired) { tFired = true; handlePull(); }  // tap (or short drag) also pulls
       tStartY = null;
     });
     crankBtn.addEventListener('touchcancel', () => { tStartY = null; });
 
-    // -- mouse (desktop) --
+    // -- mouse (desktop): drag fires mid-pull; a click fires on release --
     let mStartY = null, mFired = false;
     crankBtn.addEventListener('mousedown', (e) => {
       if (pulling) return;
@@ -917,8 +915,8 @@
       if (mStartY === null || mFired) return;
       if (e.clientY - mStartY >= PULL_THRESHOLD) { mFired = true; handlePull(); }
     });
-    window.addEventListener('mouseup', (e) => {
-      if (mStartY !== null && !mFired && e.clientY - mStartY >= PULL_THRESHOLD) { mFired = true; handlePull(); }
+    window.addEventListener('mouseup', () => {
+      if (mStartY !== null && !mFired) { mFired = true; handlePull(); }  // click also pulls
       mStartY = null;
     });
 
