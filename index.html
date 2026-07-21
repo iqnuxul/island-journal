@@ -282,7 +282,21 @@
       letter-spacing: 0.5px;
       overflow: hidden;
       box-sizing: border-box;
+      caret-color: transparent;   /* native caret hidden — replaced by .caret-img */
     }
+    /* ===== Custom typing caret (typing.png) — positioned over the real caret spot ===== */
+    .caret-img {
+      position: absolute;
+      top: 0; left: 0;
+      height: 26px;
+      width: auto;
+      pointer-events: none;
+      display: none;
+      transform: translateY(-1px);
+    }
+    .caret-img.is-visible { display: block; opacity: 1; animation: caret-blink 1s step-end infinite; }
+    .caret-img.is-visible.is-typing { animation: none; opacity: 1; }  /* solid while actively typing */
+    @keyframes caret-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
     .answer-input::placeholder {
       font-family: 'Mydogfont', cursive;
       color: rgba(42, 29, 16, 0.3);
@@ -920,6 +934,64 @@
       mStartY = null;
     });
 
+    /* ================= Custom typing caret (typing.png) =================
+       Textareas have no way to swap the native caret for an image, so we hide
+       the real one (caret-color: transparent) and track its pixel position
+       ourselves with the standard "mirror div" technique: an off-screen div
+       with identical font/box styling renders the text up to the caret, and a
+       marker span inside it tells us exactly where the caret would sit. */
+    const caretMirror = document.createElement('div');
+    caretMirror.style.cssText = 'position:absolute; top:0; left:-9999px; visibility:hidden; white-space:pre-wrap; overflow-wrap:break-word; margin:0; border:0;';
+    document.body.appendChild(caretMirror);
+
+    function positionCaret(ta, img) {
+      const cs = getComputedStyle(ta);
+      caretMirror.style.font = cs.font;
+      caretMirror.style.letterSpacing = cs.letterSpacing;
+      caretMirror.style.padding = cs.padding;
+      caretMirror.style.boxSizing = cs.boxSizing;
+      caretMirror.style.width = ta.clientWidth + 'px';
+
+      const pos = ta.selectionStart;
+      caretMirror.textContent = '';
+      caretMirror.appendChild(document.createTextNode(ta.value.slice(0, pos)));
+      const marker = document.createElement('span');
+      marker.textContent = '​';
+      caretMirror.appendChild(marker);
+
+      const pad = ta.closest('.answer-pad');
+      const taRect = ta.getBoundingClientRect();
+      const padRect = pad.getBoundingClientRect();
+      const baseLeft = taRect.left - padRect.left;
+      const baseTop  = taRect.top  - padRect.top - ta.scrollTop;
+
+      img.style.left = (baseLeft + marker.offsetLeft) + 'px';
+      img.style.top  = (baseTop  + marker.offsetTop) + 'px';
+    }
+
+    function setupCaret(ta, img) {
+      let typingTimer = null;
+      const update = () => { positionCaret(ta, img); img.classList.add('is-visible'); };
+      const markTyping = () => {
+        img.classList.add('is-typing');
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => img.classList.remove('is-typing'), 500);
+      };
+      ta.addEventListener('focus', update);
+      ta.addEventListener('blur', () => img.classList.remove('is-visible', 'is-typing'));
+      ta.addEventListener('input', () => { update(); markTyping(); });
+      ta.addEventListener('click', update);
+      ta.addEventListener('keyup', update);
+    }
+    // Reposition the active caret on viewport/layout changes (e.g. rotation, resize).
+    window.addEventListener('resize', () => {
+      const ta = document.activeElement;
+      if (ta && ta.classList && ta.classList.contains('answer-input')) {
+        const img = ta.parentElement.querySelector('.caret-img');
+        if (img) positionCaret(ta, img);
+      }
+    });
+
     /* ================= Answer rendering / save ================= */
     let saveTimer;
     function debouncedSave() {
@@ -947,6 +1019,7 @@
           </div>
           <div class="answer-pad">
             <textarea class="answer-input" data-idx="${i}" placeholder="..."></textarea>
+            <img class="caret-img" src="typing.png" alt="" draggable="false" />
           </div>
         </div>
       `).join('') + `
@@ -980,6 +1053,9 @@
 
         // Initial height adjustment
         autoExpand(ta);
+
+        // Custom typing.png caret
+        setupCaret(ta, ta.parentElement.querySelector('.caret-img'));
       });
       const saveBtnEl = document.getElementById('saveBtn');
       const saveIconsEl = document.getElementById('saveIcons');
